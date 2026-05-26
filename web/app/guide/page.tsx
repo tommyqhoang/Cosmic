@@ -162,7 +162,7 @@ const PQS = [
 const PQ_TIPS = [
   'Be patient and friendly — many parties welcome first-timers.',
   'Ask your leader which stage job you have before rushing ahead.',
-  'Don’t leave mid-run; it can fail the whole party.',
+  "Don't leave mid-run; it can fail the whole party.",
   'Keep some potions handy — a few stages have tougher monsters.',
 ]
 
@@ -199,15 +199,34 @@ const FAST_TIPS = [
 
 /* ── Commands data ── */
 const COMMANDS = [
-  { cmd: '@help', desc: 'Shows the list of player commands available to you.', when: 'When you’re lost or just starting out.' },
-  { cmd: '@commands', desc: 'Full reference of every command you can use.', when: 'To discover what’s possible.' },
-  { cmd: '@rates', desc: 'Displays the server’s EXP, Meso and Drop rates.', when: 'To confirm current event rates.' },
-  { cmd: '@online', desc: 'Lists players currently online.', when: 'To see who’s around to party.' },
-  { cmd: '@save', desc: 'Force-saves your character progress.', when: 'Before logging off or after big gains.' },
-  { cmd: '@ea', desc: 'Auto-accepts your active expedition / party invites.', when: 'When joining boss runs quickly.' },
-  { cmd: '@dispose', desc: 'Fixes a “stuck” NPC conversation or frozen character.', when: 'If an NPC won’t respond.' },
-  { cmd: '@mapfix', desc: 'Returns you to the map’s entry point if you fall out of bounds.', when: 'When stuck in terrain.' },
-  { cmd: '@gm', desc: 'Sends a help request to online staff.', when: 'Only when you genuinely need a GM.' },
+  { cmd: '@help',        desc: 'Show available commands.' },
+  { cmd: '@commands',    desc: 'Show available commands.' },
+  { cmd: '@droplimit',   desc: 'Check drop limit of current map.' },
+  { cmd: '@time',        desc: 'Show current server time.' },
+  { cmd: '@credits',     desc: 'Show credits — the people who made the server possible.' },
+  { cmd: '@uptime',      desc: 'Show server online time.' },
+  { cmd: '@gacha',       desc: 'Show gachapon rewards.' },
+  { cmd: '@dispose',     desc: 'Dispose to fix a stuck NPC chat or frozen character.' },
+  { cmd: '@changel',     desc: 'Change language settings.' },
+  { cmd: '@equiplv',     desc: 'Show levels of all equipped items.' },
+  { cmd: '@showrates',   desc: 'Show all world/character rates.' },
+  { cmd: '@rates',       desc: 'Show your personal rates.' },
+  { cmd: '@online',      desc: 'Show all online players.' },
+  { cmd: '@gm',          desc: 'Send a message to the game masters.' },
+  { cmd: '@reportbug',   desc: 'Send in a bug report.' },
+  { cmd: '@points',      desc: 'Show your point total.' },
+  { cmd: '@joinevent',   desc: 'Join the active event.' },
+  { cmd: '@leaveevent',  desc: 'Leave the active event.' },
+  { cmd: '@ranks',       desc: 'Show player rankings.' },
+  { cmd: '@str',         desc: 'Assign AP into STR.' },
+  { cmd: '@dex',         desc: 'Assign AP into DEX.' },
+  { cmd: '@int',         desc: 'Assign AP into INT.' },
+  { cmd: '@luk',         desc: 'Assign AP into LUK.' },
+  { cmd: '@enableauth',  desc: 'Enable PIC code by resetting the cooldown.' },
+  { cmd: '@toggleexp',   desc: 'Toggle enable/disable all EXP gain.' },
+  { cmd: '@mylawn',      desc: 'Claim ownership of the current map.' },
+  { cmd: '@bosshp',      desc: 'Show HP of bosses on the current map.' },
+  { cmd: '@mobhp',       desc: 'Show HP of mobs on the current map.' },
 ]
 
 /* ── NPC data ── */
@@ -223,7 +242,7 @@ const NPCS = [
 
 /* ── Bossing data ── */
 const PROGRESSION_STAGES = [
-  { emoji: '🌱', tier: 'Early Game (Lv 1–70)', color: '#1d6b41', text: 'Wear whatever drops, do PQs, and grab cheap FM gear. Don’t over-invest — you’ll out-level it fast.' },
+  { emoji: '🌱', tier: 'Early Game (Lv 1–70)', color: '#1d6b41', text: "Wear whatever drops, do PQs, and grab cheap FM gear. Don't over-invest — you'll out-level it fast." },
   { emoji: '⚒️', tier: 'Mid Game (Lv 70–135)', color: '#b45309', text: 'Start scrolling weapons & armor, farm mesos, and chase your first set bonuses. Zakum becomes your goal.' },
   { emoji: '💎', tier: 'End Game (Lv 135+)', color: '#3b6ea5', text: 'Hunt boss-drop gear (Horntail, etc.), perfect your scrolls, and optimize for damage. Begin rebirthing.' },
 ]
@@ -253,9 +272,9 @@ const SCROLL_TIPS = [
 
 /* ── FAQ / extras ── */
 const MISTAKES = [
-  'Dumping AP into the wrong stat — check your class’s main stat first.',
+  "Dumping AP into the wrong stat — check your class's main stat first.",
   'Scrolling expensive gear too early (before you understand fail rates).',
-  'Ignoring Party Quests — they’re the fastest, most fun early EXP.',
+  "Ignoring Party Quests — they're the fastest, most fun early EXP.",
   'Forgetting to vote daily for free NX.',
   'Selling rare drops to NPCs instead of the Free Market.',
 ]
@@ -270,7 +289,7 @@ const GLOSSARY = [
   { term: 'Mobbing', def: 'Clearing many monsters at once for EXP.' },
   { term: 'Bossing', def: 'Fighting powerful single bosses for loot.' },
   { term: 'Scrolling', def: 'Using scrolls to upgrade equipment stats.' },
-  { term: 'Buff', def: 'A temporary boost to your stats or party’s.' },
+  { term: 'Buff', def: "A temporary boost to your stats or party's." },
 ]
 
 const EXTRA_CARDS = [
@@ -282,12 +301,12 @@ const EXTRA_CARDS = [
 ]
 
 const FAQ = [
-  { q: 'How do I create an account?', a: 'Sign up free on the website — you’ll need a valid email. A website account is required before you can log in (the game won’t auto-create one), and it’s how you agree to our Terms & Privacy Policy. Then play instantly in your browser or with the desktop client.' },
-  { q: 'I’m brand new — what should I do first?', a: 'Make a beginner-friendly class (Warrior or Magician), finish Maple Island to Lv 10, take your 1st job, grab the Starter Pack, then jump into Kerning PQ at Lv 21.' },
+  { q: 'How do I create an account?', a: "Sign up free on the website — you'll need a valid email. A website account is required before you can log in (the game won't auto-create one), and it's how you agree to our Terms & Privacy Policy. Then play instantly in your browser or with the desktop client." },
+  { q: "I'm brand new — what should I do first?", a: 'Make a beginner-friendly class (Warrior or Magician), finish Maple Island to Lv 10, take your 1st job, grab the Starter Pack, then jump into Kerning PQ at Lv 21.' },
   { q: 'Do I have to pay anything?', a: 'No. ShinyMS is completely free and not pay-to-win. You earn NX simply by voting daily.' },
   { q: 'What are the server rates?', a: 'ShinyMS runs 7× EXP, 5× Meso and 3× Drop. Type @rates in-game to confirm any active event boosts.' },
   { q: 'How do I level up fastest?', a: 'Combine grinding at high-density maps with a daily Party Quest, party with others, and hunt monsters slightly above your level.' },
-  { q: 'My NPC chat froze — help!', a: 'Type @dispose to unstick the conversation. If you’re stuck in terrain, use @mapfix.' },
+  { q: 'My NPC chat froze — help!', a: "Type @dispose to unstick the conversation. If you're stuck in terrain, use @mapfix." },
   { q: 'How does rebirth work?', a: 'Once your character is maxed, talk to the Rebirth NPC at the Free Market to reset for permanent stat bonuses. See the Rebirth section above.' },
 ]
 
@@ -401,7 +420,7 @@ export default function GuidePage() {
             {/* ═══ Classes ═══ */}
             <section id="classes" className="guide-anchor">
               <SectionHead kicker="Chapter 02" emoji="⚔️" title="Classes & Jobs"
-                sub="The five classic Explorer paths — plus the Cygnus Knights and Aran hero classes. Here’s how each plays, and which suit a fresh start." />
+                sub="The five classic Explorer paths — plus the Cygnus Knights and Aran hero classes. Here's how each plays, and which suit a fresh start." />
 
               <div className="grid sm:grid-cols-2 gap-4">
                 {CLASSES.map((c) => (
@@ -478,7 +497,7 @@ export default function GuidePage() {
                     </div>
                   ))}
                 </div>
-                <p className="text-xs mt-3" style={{ color: 'var(--foreground-subtle)' }}>These cannot be chosen by players — they’re reserved for the ShinyMS team. 🛡️</p>
+                <p className="text-xs mt-3" style={{ color: 'var(--foreground-subtle)' }}>These cannot be chosen by players — they're reserved for the ShinyMS team. 🛡️</p>
               </div>
             </section>
 
@@ -575,7 +594,7 @@ export default function GuidePage() {
               <div className="rounded-2xl p-5 mb-4" style={{ background: 'linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%)' }}>
                 <h3 className="font-display font-bold text-base mb-2" style={{ color: '#fff' }}>🎯 Long-Term Goals & Strategy</h3>
                 <ul className="flex flex-col gap-2 text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                  <li className="flex gap-2"><span aria-hidden>⭐</span> Rebirth as soon as you’re maxed — the bonuses compound over time.</li>
+                  <li className="flex gap-2"><span aria-hidden>⭐</span> Rebirth as soon as you're maxed — the bonuses compound over time.</li>
                   <li className="flex gap-2"><span aria-hidden>⭐</span> Each cycle gets faster as your permanent stats climb.</li>
                   <li className="flex gap-2"><span aria-hidden>⭐</span> Aim for high rebirth counts before tackling the hardest bosses.</li>
                 </ul>
@@ -585,7 +604,7 @@ export default function GuidePage() {
                 <h3 className="font-semibold text-sm mb-3" style={{ color: 'var(--foreground)' }}>❓ Rebirth FAQ</h3>
                 <div className="flex flex-col gap-3 text-sm">
                   <div><strong style={{ color: 'var(--foreground)' }}>Do I lose my gear?</strong><p style={{ color: 'var(--foreground-muted)' }}>No — your equipment and items stay. Only your level and EXP reset.</p></div>
-                  <div><strong style={{ color: 'var(--foreground)' }}>Is it worth it?</strong><p style={{ color: 'var(--foreground-muted)' }}>Absolutely. Rebirthing is the main way to keep growing once you’ve maxed out.</p></div>
+                  <div><strong style={{ color: 'var(--foreground)' }}>Is it worth it?</strong><p style={{ color: 'var(--foreground-muted)' }}>Absolutely. Rebirthing is the main way to keep growing once you've maxed out.</p></div>
                 </div>
               </div>
               <p className="text-xs mt-3" style={{ color: 'var(--foreground-subtle)' }}>ℹ️ Exact caps & bonuses can change with server updates — type <code style={{ fontFamily: 'var(--font-geist-mono)' }}>@help</code> or ask a GM for current details.</p>
@@ -597,15 +616,14 @@ export default function GuidePage() {
                 sub="Type these in the chat box (including the @) to get info and quality-of-life help instantly." />
 
               <div className="rounded-2xl overflow-hidden" style={cardStyle}>
-                <div className="hidden sm:grid grid-cols-[140px_1fr_1fr] gap-4 px-5 py-3 text-xs font-bold uppercase tracking-widest" style={{ backgroundColor: 'var(--surface-subtle)', color: 'var(--foreground-subtle)', borderBottom: '1px solid var(--border)' }}>
-                  <span>Command</span><span>What it does</span><span>When to use</span>
+                <div className="hidden sm:grid grid-cols-[160px_1fr] gap-4 px-5 py-3 text-xs font-bold uppercase tracking-widest" style={{ backgroundColor: 'var(--surface-subtle)', color: 'var(--foreground-subtle)', borderBottom: '1px solid var(--border)' }}>
+                  <span>Command</span><span>What it does</span>
                 </div>
                 <div className="divide-y" style={{ borderColor: 'var(--border-subtle)' }}>
                   {COMMANDS.map((c) => (
-                    <div key={c.cmd} className="grid sm:grid-cols-[140px_1fr_1fr] gap-1 sm:gap-4 px-5 py-3 hover-row">
-                      <code className="font-mono font-bold text-sm self-start" style={{ color: 'var(--primary)' }}>{c.cmd}</code>
+                    <div key={c.cmd} className="grid sm:grid-cols-[160px_1fr] gap-1 sm:gap-4 px-5 py-3 hover-row">
+                      <code className="font-mono font-bold text-sm self-center" style={{ color: 'var(--primary)' }}>{c.cmd}</code>
                       <span className="text-sm" style={{ color: 'var(--foreground)' }}>{c.desc}</span>
-                      <span className="text-xs sm:text-sm" style={{ color: 'var(--foreground-subtle)' }}>{c.when}</span>
                     </div>
                   ))}
                 </div>
@@ -765,7 +783,7 @@ export default function GuidePage() {
             {/* ── Closing CTA ── */}
             <section className="rounded-3xl p-8 sm:p-10 text-center" style={{ background: 'linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%)' }}>
               <p className="font-display font-bold text-xl sm:text-2xl mb-2" style={{ color: '#fff', letterSpacing: '0.03em' }}>Ready to begin your adventure? 🍁</p>
-              <p className="text-sm mb-6 max-w-md mx-auto" style={{ color: 'rgba(255,255,255,0.7)' }}>You’ve got the knowledge — now go make some memories. The island awaits!</p>
+              <p className="text-sm mb-6 max-w-md mx-auto" style={{ color: 'rgba(255,255,255,0.7)' }}>You've got the knowledge — now go make some memories. The island awaits!</p>
               <div className="flex flex-wrap items-center justify-center gap-3">
                 <a href="https://play.shinyms.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-150 hover:scale-[1.02]" style={{ backgroundColor: 'var(--accent)', color: '#fff' }}>Play Now →</a>
                 <Link href="/register" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-150 hover:bg-white/20" style={{ backgroundColor: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.9)', border: '1px solid rgba(255,255,255,0.2)' }}>Create Free Account</Link>

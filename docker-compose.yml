@@ -32,6 +32,8 @@ services:
       - maplestory
     ports:
       - "3000:3000"
+    volumes:
+      - ./handbook:/handbook
     environment:
       DATABASE_URL: "mysql://root:@db:3306/cosmic"
       NEXTAUTH_SECRET: "dev-secret-do-not-use-in-prod"
