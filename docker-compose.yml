@@ -26,7 +26,9 @@ services:
       - ./database/docker-db-data:/var/lib/mysql
 
   web:
-    build: ./web
+    build:
+      context: .
+      dockerfile: web/Dockerfile
     depends_on:
       - db
       - maplestory

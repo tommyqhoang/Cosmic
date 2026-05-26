@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Alert, Badge, Card, CardHeader, EmptyState, Input, Select, Spinner, PageHeader } from '@/components/admin/ui'
 import type { HandbookItem, CommandSection } from '@/app/api/admin/handbook/route'
 
-type Tab = 'Commands' | 'Items' | 'Maps' | 'Mobs' | 'Skills' | 'NPCs' | 'Jobs'
+type Tab = 'Commands' | 'Items' | 'Maps' | 'Mobs' | 'Skills' | 'NPCs' | 'Jobs' | 'Quests' | 'Gender'
 
 const TABS: { label: Tab; category: string | null }[] = [
   { label: 'Commands', category: 'commands' },
@@ -13,6 +13,8 @@ const TABS: { label: Tab; category: string | null }[] = [
   { label: 'Skills',   category: 'skill' },
   { label: 'NPCs',     category: 'npc' },
   { label: 'Jobs',     category: 'job' },
+  { label: 'Quests',   category: 'quest' },
+  { label: 'Gender',   category: 'gender' },
 ]
 
 const ITEM_SUBCATEGORIES = [
