@@ -11,7 +11,7 @@ export type HandbookResponse =
   | { type: 'items'; items: HandbookItem[] }
   | { type: 'commands'; sections: CommandSection[] }
 
-const HANDBOOK_DIR = process.env.HANDBOOK_DIR ?? '/handbook'
+const HANDBOOK_DIR = process.env.HANDBOOK_DIR ?? path.join(process.cwd(), 'public', 'handbook')
 
 const CATEGORY_FILES: Record<string, string> = {
   'equip/accessory': 'Equip/Accessory.txt',
