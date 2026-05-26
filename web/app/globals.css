@@ -1,0 +1,395 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  /* Surfaces */
+  --background: #fef9f0;
+  --surface: #ffffff;
+  --surface-subtle: #fdf6ea;
+  --surface-raised: #fefbf5;
+
+  /* Borders */
+  --border: #e2d4bc;
+  --border-subtle: #ede0cc;
+  --border-strong: #c8b898;
+
+  /* Text */
+  --foreground: #1c1527;
+  --foreground-muted: #64586c;
+  --foreground-subtle: #9c8fa6;
+
+  /* Primary — Maple Blue */
+  --primary: #3b6ea5;
+  --primary-hover: #2d5580;
+  --primary-active: #234469;
+  --primary-subtle: #e8f0f8;
+  --primary-foreground: #ffffff;
+
+  /* Accent — Maple Gold */
+  --accent: #c89a2e;
+  --accent-hover: #a87e22;
+  --accent-subtle: #fef8e7;
+  --accent-foreground: #6b4e10;
+
+  /* Semantic */
+  --success: #1d6b41;
+  --success-subtle: #e8f5ef;
+  --success-border: #a7d4bc;
+  --warning: #b45309;
+  --warning-subtle: #fef3cd;
+  --destructive: #b91c1c;
+  --destructive-subtle: #fef2f2;
+  --destructive-border: #fecaca;
+
+  /* Deep navy for hero */
+  --navy: #1a3a5c;
+  --navy-mid: #2d5580;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* ── Display font utility ── */
+.font-display {
+  font-family: var(--font-fredoka), 'Baloo 2', 'Trebuchet MS', system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+/* ── Category badge colors ── */
+.badge-changelog   { background-color: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.badge-maintenance { background-color: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+.badge-alert       { background-color: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+.badge-event       { background-color: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+.badge-update      { background-color: #faf5ff; color: #6b21a8; border: 1px solid #e9d5ff; }
+
+/* ── Markdown prose ── */
+.maple-prose { font-size: 0.9375rem; line-height: 1.75; color: var(--foreground-muted); }
+.maple-prose p { margin-bottom: 0.875em; }
+.maple-prose p:last-child { margin-bottom: 0; }
+.maple-prose strong { color: var(--foreground); font-weight: 600; }
+.maple-prose a { color: var(--primary); text-decoration: underline; }
+.maple-prose a:hover { color: var(--primary-hover); }
+.maple-prose ul { list-style: disc; padding-left: 1.5em; margin-bottom: 0.875em; }
+.maple-prose ol { list-style: decimal; padding-left: 1.5em; margin-bottom: 0.875em; }
+.maple-prose li { margin-bottom: 0.3em; }
+.maple-prose h1, .maple-prose h2, .maple-prose h3 {
+  font-weight: 700;
+  color: var(--foreground);
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+.maple-prose h1 { font-size: 1.375rem; }
+.maple-prose h2 { font-size: 1.125rem; }
+.maple-prose h3 { font-size: 1rem; }
+.maple-prose code {
+  background: var(--surface-subtle);
+  color: var(--foreground);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  font-size: 0.875em;
+  font-family: var(--font-geist-mono, monospace);
+  border: 1px solid var(--border-subtle);
+}
+.maple-prose pre {
+  background: var(--surface-subtle);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1em 1.25em;
+  overflow-x: auto;
+  margin-bottom: 0.875em;
+}
+.maple-prose pre code { background: none; border: none; padding: 0; }
+.maple-prose blockquote {
+  border-left: 3px solid var(--border-strong);
+  padding-left: 1em;
+  color: var(--foreground-subtle);
+  font-style: italic;
+  margin-bottom: 0.875em;
+}
+
+/* ── Animations ── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.animate-fade-up   { animation: fade-up 0.5s ease forwards; }
+.animate-pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+
+/* ── Smega (megaphone) ticker — the in-game super-megaphone banner, scrolling ── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.smega-marquee {
+  display: inline-flex;
+  white-space: nowrap;
+  will-change: transform;
+  animation: marquee 40s linear infinite;
+}
+.smega-ticker:hover .smega-marquee { animation-play-state: paused; }
+.smega-band {
+  /* The classic orange super-megaphone gradient */
+  background: linear-gradient(180deg, #ff9e2c 0%, #f97216 55%, #e85d04 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), inset 0 -2px 0 rgba(0,0,0,0.12);
+}
+@media (prefers-reduced-motion: reduce) {
+  .smega-marquee { animation: none; }
+}
+
+/* ── Hover utilities for server components ── */
+.hover-card {
+  transition: border-color 150ms, box-shadow 150ms;
+}
+.hover-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(59,110,165,0.1);
+}
+.hover-row {
+  transition: background-color 150ms;
+}
+.hover-row:hover {
+  background-color: var(--surface-subtle);
+}
+.nav-link {
+  transition: background-color 150ms, color 150ms;
+}
+.nav-link:hover {
+  background-color: var(--primary-subtle);
+  color: var(--primary);
+}
+
+/* ── Focus rings ── */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Accessibility helpers ── */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Admin console design system ──────────────────────────────
+   A crisp, Linear/Vercel/Notion-style surface built on the shared
+   brand tokens so the console stays consistent with the public site. */
+
+.admin-field {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  color: var(--foreground);
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  transition: border-color 120ms, box-shadow 120ms;
+}
+.admin-field::placeholder { color: var(--foreground-subtle); }
+.admin-field:hover { border-color: var(--border-strong); }
+.admin-field:focus,
+.admin-field:focus-visible {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-subtle);
+}
+.admin-field:disabled { opacity: 0.55; cursor: not-allowed; }
+.admin-field[aria-invalid='true'] {
+  border-color: var(--destructive);
+}
+.admin-field[aria-invalid='true']:focus {
+  box-shadow: 0 0 0 3px var(--destructive-subtle);
+}
+
+/* Card surface + subtle elevation used across the console */
+.admin-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  box-shadow: 0 1px 2px rgba(28, 21, 39, 0.04), 0 1px 3px rgba(28, 21, 39, 0.04);
+}
+
+/* Mobile drawer slide-in */
+@keyframes drawer-in {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+.animate-drawer-in { animation: drawer-in 200ms ease forwards; }
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.animate-overlay-in { animation: overlay-in 150ms ease forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up, .animate-drawer-in, .animate-overlay-in { animation: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* ── Player Guide ─────────────────────────────────────────────
+   Smooth anchor navigation that clears the sticky 64px header. */
+html { scroll-behavior: smooth; }
+.guide-anchor { scroll-margin-top: 88px; }
+
+/* Decorative section eyebrow */
+.guide-kicker {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* TOC link states (client-highlighted) */
+.guide-toc-link {
+  transition: background-color 140ms, color 140ms, border-color 140ms;
+  border-left: 2px solid transparent;
+}
+.guide-toc-link:hover { background-color: var(--surface-subtle); color: var(--primary); }
+.guide-toc-link[data-active='true'] {
+  background-color: var(--primary-subtle);
+  color: var(--primary);
+  border-left-color: var(--primary);
+  font-weight: 600;
+}
+
+/* Stat pip used on class cards */
+.guide-pip { width: 7px; height: 7px; border-radius: 9999px; }
+
+/* ════════════════════════════════════════════════════════════════
+   MAPLE NOSTALGIA LAYER
+   Sprites, classic UI window chrome, daytime sky scene and the
+   bubbly outlined logo treatment — the pieces that make the site
+   feel like booting up GMS v83 in 2007.
+   ════════════════════════════════════════════════════════════════ */
+
+/* Crisp scaling for pixel sprites pulled from maplestory.io */
+.sprite { image-rendering: pixelated; image-rendering: crisp-edges; }
+
+/* Drop shadow so sprites read as standing on the ground */
+.sprite-grounded { filter: drop-shadow(0 4px 2px rgba(26,58,92,0.28)); }
+
+/* ── Sprite motion ── */
+@keyframes sprite-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+@keyframes sprite-hop {
+  0%, 70%, 100% { transform: translateY(0); }
+  80%           { transform: translateY(-14px); }
+  90%           { transform: translateY(-4px); }
+}
+@keyframes sprite-sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50%      { transform: rotate(3deg); }
+}
+.sprite-bob  { animation: sprite-bob 3s ease-in-out infinite; }
+.sprite-hop  { animation: sprite-hop 2.6s ease-in-out infinite; }
+.sprite-sway { animation: sprite-sway 4s ease-in-out infinite; transform-origin: bottom center; }
+
+/* ── Drifting clouds ── */
+@keyframes cloud-drift {
+  from { transform: translateX(-12vw); }
+  to   { transform: translateX(112vw); }
+}
+.cloud { animation: cloud-drift linear infinite; }
+
+/* ── Falling maple leaves ── */
+@keyframes leaf-fall {
+  0%   { transform: translateY(-10%) rotate(0deg);   opacity: 0; }
+  10%  { opacity: 0.9; }
+  90%  { opacity: 0.9; }
+  100% { transform: translateY(560px) rotate(320deg); opacity: 0; }
+}
+.leaf { animation: leaf-fall linear infinite; }
+
+/* ── Classic MapleStory UI window ── */
+.maple-window {
+  position: relative;
+  background: var(--surface-raised);
+  border: 2px solid #2a4a73;
+  border-radius: 12px;
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,0.7),
+    0 10px 30px -12px rgba(26,58,92,0.45);
+}
+.maple-window-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #fff;
+  background: linear-gradient(180deg, #6b9bd6 0%, #3b6ea5 55%, #2d5580 100%);
+  border-radius: 9px 9px 0 0;
+  border-bottom: 2px solid #2a4a73;
+  text-shadow: 0 1px 1px rgba(26,58,92,0.6);
+}
+.maple-window-body { padding: 1rem 1.125rem; }
+
+/* ── Bubbly outlined logo text (MapleStory wordmark feel) ── */
+.maple-logo-text {
+  color: #fff;
+  text-shadow:
+    -2px -2px 0 #234469, 2px -2px 0 #234469,
+    -2px  2px 0 #234469, 2px  2px 0 #234469,
+     0   -2px 0 #234469, 0    2px 0 #234469,
+    -2px  0   0 #234469, 2px  0   0 #234469,
+     0    5px 0 #1a3a5c, 0    7px 10px rgba(0,0,0,0.35);
+}
+.maple-logo-accent { color: var(--accent); }
+
+/* ── Grassy ground strip for the hero ── */
+.maple-grass {
+  background:
+    linear-gradient(180deg, #7fc24a 0%, #5fa233 38%, #4a8a28 100%);
+  box-shadow: inset 0 3px 0 rgba(255,255,255,0.35);
+}
+.maple-grass-edge {
+  background-image: radial-gradient(circle at 10px -4px, #7fc24a 9px, transparent 10px);
+  background-size: 20px 14px;
+  background-repeat: repeat-x;
+}
+
+/* ── Pixel-tile divider (wooden plank vibe) ── */
+.maple-kicker-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-foreground);
+  background: var(--accent-subtle);
+  border: 1px solid var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sprite-bob, .sprite-hop, .sprite-sway, .cloud, .leaf { animation: none; }
+}

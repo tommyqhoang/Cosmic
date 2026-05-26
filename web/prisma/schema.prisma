@@ -1,0 +1,239 @@
+generator client {
+  provider      = "prisma-client-js"
+  // node:20-alpine ships OpenSSL 3; without this Prisma generates the
+  // openssl-1.1.x engine and fails at runtime (libssl.so.1.1 not found).
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ──────────────────────────────────────────────
+// Existing v83 game tables (read-only from CMS)
+// Do NOT run migrations that modify these tables.
+// ──────────────────────────────────────────────
+
+model Account {
+  id           Int       @id @default(autoincrement())
+  name         String    @unique @db.VarChar(13)
+  password     String    @db.VarChar(128)
+  email        String?   @db.VarChar(45)
+  banned       Int       @default(0) @db.TinyInt
+  banreason    String?   @db.Text
+  mute         Int       @default(0)
+  webadmin     Int       @default(0)
+  loggedin     Int       @default(0) @db.TinyInt
+  lastlogin    DateTime?
+  createdat    DateTime  @default(now())
+  nxCredit     Int?
+  maplePoint   Int?
+  votepoints   Int       @default(0)
+  rewardpoints Int       @default(0)
+  birthday     DateTime  @default(dbgenerated("'0000-01-01'")) @db.Date
+  tos          Int       @default(0) @db.TinyInt
+  language     Int       @default(2)
+
+  characters Character[]
+  posts      CmsPost[]
+
+  @@map("accounts")
+}
+
+model Character {
+  id        Int    @id @default(autoincrement())
+  accountid Int
+  world     Int    @default(0)
+  name      String @db.VarChar(13)
+  level     Int    @default(1)
+  exp       Int    @default(0)
+  job       Int    @default(0)
+  rank      Int    @default(1)
+  rankMove  Int    @default(0)
+  guildid   Int    @default(0)
+  guildrank Int    @default(5)
+  gm        Int    @default(0) @db.TinyInt
+  fame      Int    @default(0)
+  reborns   Int    @default(0)
+  str       Int    @default(12)
+  dex       Int    @default(5)
+  intStat   Int    @default(4)  @map("int")
+  luk       Int    @default(4)
+  maxhp     Int    @default(50)
+  maxmp     Int    @default(5)
+
+  account        Account         @relation(fields: [accountid], references: [id])
+  inventoryItems InventoryItem[]
+
+  @@map("characters")
+}
+
+model InventoryItem {
+  inventoryitemid Int                 @id @default(autoincrement()) @db.UnsignedInt
+  type            Int                 @db.UnsignedTinyInt
+  characterid     Int?
+  accountid       Int?
+  itemid          Int
+  inventorytype   Int
+  position        Int
+  quantity        Int                 @default(1)
+  owner           String              @db.TinyText
+  petid           Int                 @default(-1)
+  flag            Int
+  expiration      BigInt              @default(-1)
+  giftFrom        String              @db.VarChar(26)
+
+  character Character?          @relation(fields: [characterid], references: [id])
+  equipment InventoryEquipment?
+
+  @@map("inventoryitems")
+}
+
+model InventoryEquipment {
+  inventoryequipmentid Int    @id @default(autoincrement()) @db.UnsignedInt
+  inventoryitemid      Int    @unique @db.UnsignedInt
+  upgradeslots         Int    @default(0)
+  level                Int    @default(0)
+  str                  Int    @default(0)
+  dex                  Int    @default(0)
+  intStat              Int    @default(0) @map("int")
+  luk                  Int    @default(0)
+  hp                   Int    @default(0)
+  mp                   Int    @default(0)
+  watk                 Int    @default(0)
+  matk                 Int    @default(0)
+  wdef                 Int    @default(0)
+  mdef                 Int    @default(0)
+  acc                  Int    @default(0)
+  avoid                Int    @default(0)
+  hands                Int    @default(0)
+  speed                Int    @default(0)
+  jump                 Int    @default(0)
+  locked               Int    @default(0)
+  vicious              Int    @default(0) @db.UnsignedInt
+  itemlevel            Int    @default(1)
+  itemexp              Int    @default(0) @db.UnsignedInt
+  ringid               Int    @default(-1)
+
+  item InventoryItem @relation(fields: [inventoryitemid], references: [inventoryitemid])
+
+  @@map("inventoryequipment")
+}
+
+model Guild {
+  guildid  Int     @id @default(autoincrement())
+  leader   Int     @default(0)
+  GP       Int     @default(0)
+  name     String  @db.VarChar(45)
+  capacity Int     @default(10)
+  notice   String? @db.VarChar(101)
+
+  @@map("guilds")
+}
+
+// Vote cooldown tracking. The game reads this table in
+// MapleClient.getVoteTime() ("SELECT date FROM bit_votingrecords WHERE
+// UPPER(account) = UPPER(?)") to enforce the 24h vote cooldown; `date` is a
+// unix timestamp in seconds. The vote pingback endpoint upserts a row here.
+model VotingRecord {
+  account String @id @db.VarChar(13)
+  date    Int    @default(0)
+
+  @@map("bit_votingrecords")
+}
+
+model BosslogDaily {
+  id          Int      @id @default(autoincrement())
+  characterid Int
+  bosstype    String   @db.VarChar(10)
+  attempttime DateTime @default(now())
+
+  @@map("bosslog_daily")
+}
+
+model BosslogWeekly {
+  id          Int      @id @default(autoincrement())
+  characterid Int
+  bosstype    String   @db.VarChar(10)
+  attempttime DateTime @default(now())
+
+  @@map("bosslog_weekly")
+}
+
+// ──────────────────────────────────────────────
+// CMS-owned tables (managed by Prisma migrations)
+// ──────────────────────────────────────────────
+
+model CmsPost {
+  id        Int      @id @default(autoincrement())
+  title     String   @db.VarChar(200)
+  content   String   @db.Text
+  category  String   @db.VarChar(20)
+  authorId  Int
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author Account @relation(fields: [authorId], references: [id])
+
+  @@map("cms_posts")
+}
+
+model CmsDownload {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(100)
+  description  String?  @db.Text
+  url          String   @db.VarChar(500)
+  category     String   @db.VarChar(20)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  @@map("cms_downloads")
+}
+
+// Smega (super/item/triple megaphone) broadcast log. The game server inserts a
+// row each time a player fires one of these world-wide megaphones (see
+// UseCashItemHandler), letting the website mirror the in-game feed. Pruned by
+// a cron/TTL so it stays small; nothing else in the game reads it.
+model CmsSmega {
+  id        Int      @id @default(autoincrement())
+  player    String   @db.VarChar(13)
+  channel   Int      @default(0)
+  type      String   @db.VarChar(10) // super | item | triple
+  message   String   @db.Text
+  itemId    Int?     @map("item_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@map("cms_smega")
+}
+
+// Newsletter subscribers. Visitors opt in from the homepage; an email goes out to
+// every active row when an admin publishes an announcement. `token` is a random
+// secret used for one-click unsubscribe links (no login required). Unsubscribing
+// flips `active` to false rather than deleting, so a re-subscribe keeps history.
+model CmsSubscriber {
+  id             Int       @id @default(autoincrement())
+  email          String    @unique @db.VarChar(254)
+  token          String    @unique @db.VarChar(64)
+  active         Boolean   @default(true)
+  createdAt      DateTime  @default(now()) @map("created_at")
+  unsubscribedAt DateTime? @map("unsubscribed_at")
+
+  @@index([active])
+  @@map("cms_subscribers")
+}
+
+// Generic key/value store for admin-editable site settings (e.g. social media
+// links: social_youtube, social_instagram, social_facebook). Kept as key/value
+// rather than typed columns so new settings can be added without a migration.
+// A missing or empty value means "not set" — the footer only renders links that
+// are present and non-blank.
+model CmsSetting {
+  key       String   @id @db.VarChar(64)
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("cms_settings")
+}
