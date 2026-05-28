@@ -10,3 +10,7 @@ tools
 
 # Created by the db when using docker-compose, large and causes rebuild issues if sent to the context.
 docker-db-data
+
+# Next.js build output — let Docker build produce a fresh one each time.
+web/.next
+web/node_modules

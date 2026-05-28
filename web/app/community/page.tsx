@@ -188,7 +188,7 @@ export default async function CommunityPage() {
     getSocialLinks(),
   ])
 
-  const discordUrl = social.discord || 'https://discord.gg/jKueJFAErs'
+  const discordUrl = social.discord || null
 
   return (
     <div className="relative overflow-hidden">
@@ -233,7 +233,7 @@ export default async function CommunityPage() {
 
           {/* CTA */}
           <div className="mt-6 flex items-center justify-center gap-3 flex-wrap">
-            <a href={discordUrl} target="_blank" rel="noopener noreferrer" className="ms-btn">💬 JOIN DISCORD</a>
+            {discordUrl && <a href={discordUrl} target="_blank" rel="noopener noreferrer" className="ms-btn">💬 JOIN DISCORD</a>}
             <Link href="/news" className="ms-btn">📰 SEE LATEST NEWS</Link>
             <span className="ms-muted hidden sm:inline" style={{ fontSize: 18 }}>
               Not playing yet? <Link href="/register" style={{ color: '#c64b1b', fontWeight: 700, textDecoration: 'underline dotted' }}>Make an account →</Link>

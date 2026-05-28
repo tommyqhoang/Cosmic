@@ -1,8 +1,9 @@
 import { prisma } from '@/lib/prisma'
 import NewsQuestFeed from '@/components/maple/NewsQuestFeed'
+import { getSocialLinks } from '@/lib/settings'
 import type { Metadata } from 'next'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'News & Announcements',
@@ -24,6 +25,6 @@ async function getPosts() {
 }
 
 export default async function NewsPage() {
-  const posts = await getPosts()
-  return <NewsQuestFeed posts={posts} />
+  const [posts, social] = await Promise.all([getPosts(), getSocialLinks()])
+  return <NewsQuestFeed posts={posts} discordUrl={social.discord || undefined} />
 }

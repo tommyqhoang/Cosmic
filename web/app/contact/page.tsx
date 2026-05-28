@@ -3,7 +3,7 @@ import Link from 'next/link'
 import NpcBox from '@/components/maple/NpcBox'
 import SectionBanner from '@/components/maple/SectionBanner'
 import ContactForm from '@/components/contact/ContactForm'
-import { getSocialLinks } from '@/lib/settings'
+import { getSocialLinks, getGeneralSettings } from '@/lib/settings'
 
 export const metadata: Metadata = {
   title: 'Contact Us',
@@ -24,8 +24,9 @@ const EXPECT = [
 ]
 
 export default async function ContactPage() {
-  const social = await getSocialLinks()
-  const discordUrl = social.discord || 'https://discord.gg/jKueJFAErs'
+  const [social, general] = await Promise.all([getSocialLinks(), getGeneralSettings()])
+  const discordUrl = social.discord || null
+  const npcName = general.contactNpcName
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14 relative">
@@ -64,7 +65,7 @@ export default async function ContactPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 lg:gap-8 items-start">
         {/* Form */}
-        <NpcBox title="Send us a message" npcName="Maya">
+        <NpcBox title="Send us a message" npcName={npcName}>
           <div style={{ fontFamily: 'var(--ms-font-b)', fontSize: 18 }}>
             <ContactForm />
           </div>
@@ -72,33 +73,35 @@ export default async function ContactPage() {
 
         {/* Sidebar */}
         <aside className="flex flex-col gap-5">
-          {/* Discord CTA */}
-          <div className="ms-pixel-panel p-0">
-            <div
-              className="px-4 py-3"
-              style={{
-                fontFamily: 'var(--ms-font-d)',
-                fontSize: 11,
-                letterSpacing: 1,
-                color: '#ffd96b',
-                background: 'linear-gradient(to bottom, #6a4830 0%, #4a3220 100%)',
-                borderBottom: '3px solid var(--ms-npc-border-out)',
-              }}
-            >
-              💬 Prefer Discord?
-            </div>
-            <div className="p-4" style={{ fontFamily: 'var(--ms-font-b)', fontSize: 20, color: 'var(--ms-text)' }}>
-              <p className="mb-4">For quick questions, the fastest way to reach us — and the rest of the community — is our Discord server.</p>
-              <a
-                href={discordUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ms-btn ms-btn-sm"
+          {/* Discord CTA — only shown when admin has configured the Discord URL */}
+          {discordUrl && (
+            <div className="ms-pixel-panel p-0">
+              <div
+                className="px-4 py-3"
+                style={{
+                  fontFamily: 'var(--ms-font-d)',
+                  fontSize: 11,
+                  letterSpacing: 1,
+                  color: '#ffd96b',
+                  background: 'linear-gradient(to bottom, #6a4830 0%, #4a3220 100%)',
+                  borderBottom: '3px solid var(--ms-npc-border-out)',
+                }}
               >
-                Join our Discord →
-              </a>
+                💬 Prefer Discord?
+              </div>
+              <div className="p-4" style={{ fontFamily: 'var(--ms-font-b)', fontSize: 20, color: 'var(--ms-text)' }}>
+                <p className="mb-4">For quick questions, the fastest way to reach us — and the rest of the community — is our Discord server.</p>
+                <a
+                  href={discordUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ms-btn ms-btn-sm"
+                >
+                  Join our Discord →
+                </a>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* What to expect */}
           <div className="ms-pixel-panel p-0">

@@ -4,14 +4,16 @@ import { SOCIAL_PLATFORMS, type SocialLinks } from '@/lib/social'
 
 const SOCIAL_KEYS = SOCIAL_PLATFORMS.map((p) => p.key)
 
-// Cache tag for the social links. The footer renders in the root layout on every
-// page, so reading from the DB per request would deopt every route to dynamic.
-// Wrapping the read in unstable_cache keeps pages cacheable; the admin save path
-// calls revalidateTag(SOCIAL_LINKS_TAG) so changes show without a redeploy.
 export const SOCIAL_LINKS_TAG = 'social-links'
+export const GENERAL_SETTINGS_TAG = 'general-settings'
+export const SERVER_RATES_TAG = 'server-rates'
 
-// Uncached read straight from the DB. Used by the admin API (low traffic, needs
-// to reflect the latest save immediately). The footer uses the cached variant.
+export const CONTACT_NPC_NAME_KEY = 'site_contact_npc_name'
+export const EXP_RATE_KEY = 'server_exp_rate'
+export const MESO_RATE_KEY = 'server_meso_rate'
+export const DROP_RATE_KEY = 'server_drop_rate'
+
+// Uncached read straight from the DB. Used by the admin API.
 export async function readSocialLinks(): Promise<SocialLinks> {
   const blank = Object.fromEntries(SOCIAL_PLATFORMS.map((p) => [p.id, ''])) as SocialLinks
 
@@ -27,9 +29,51 @@ export async function readSocialLinks(): Promise<SocialLinks> {
   }
 }
 
-// Returns the configured social links, mapped by platform id ('' when unset).
-// Cached with a 5-minute safety revalidate plus on-demand invalidation via tag.
+// Cached variant used by the footer (global layout).
 export const getSocialLinks = unstable_cache(readSocialLinks, ['social-links'], {
   tags: [SOCIAL_LINKS_TAG],
+  revalidate: 300,
+})
+
+export type GeneralSettings = { contactNpcName: string }
+
+export async function readGeneralSettings(): Promise<GeneralSettings> {
+  try {
+    const row = await prisma.cmsSetting.findUnique({ where: { key: CONTACT_NPC_NAME_KEY } })
+    return { contactNpcName: row?.value?.trim() || 'Maya' }
+  } catch {
+    return { contactNpcName: 'Maya' }
+  }
+}
+
+export const getGeneralSettings = unstable_cache(readGeneralSettings, ['general-settings'], {
+  tags: [GENERAL_SETTINGS_TAG],
+  revalidate: 300,
+})
+
+export type ServerRates = { expRate: number; mesoRate: number; dropRate: number }
+
+export async function readServerRates(): Promise<ServerRates> {
+  try {
+    const rows = await prisma.cmsSetting.findMany({
+      where: { key: { in: [EXP_RATE_KEY, MESO_RATE_KEY, DROP_RATE_KEY] } },
+    })
+    const byKey = new Map(rows.map((r) => [r.key, r.value]))
+    const parse = (key: string, def: number) => {
+      const v = Number(byKey.get(key))
+      return v > 0 ? v : def
+    }
+    return {
+      expRate: parse(EXP_RATE_KEY, 7),
+      mesoRate: parse(MESO_RATE_KEY, 5),
+      dropRate: parse(DROP_RATE_KEY, 3),
+    }
+  } catch {
+    return { expRate: 7, mesoRate: 5, dropRate: 3 }
+  }
+}
+
+export const getServerRates = unstable_cache(readServerRates, ['server-rates'], {
+  tags: [SERVER_RATES_TAG],
   revalidate: 300,
 })

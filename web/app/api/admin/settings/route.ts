@@ -5,27 +5,46 @@ import { z } from 'zod'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { SOCIAL_PLATFORMS } from '@/lib/social'
-import { readSocialLinks, SOCIAL_LINKS_TAG } from '@/lib/settings'
+import {
+  readSocialLinks,
+  readGeneralSettings,
+  readServerRates,
+  SOCIAL_LINKS_TAG,
+  GENERAL_SETTINGS_TAG,
+  SERVER_RATES_TAG,
+  CONTACT_NPC_NAME_KEY,
+  EXP_RATE_KEY,
+  MESO_RATE_KEY,
+  DROP_RATE_KEY,
+} from '@/lib/settings'
 
-// Each social link is optional and may be cleared (empty string). When present
-// it must be an http(s) URL — anything else is rejected so a bad value can't be
-// injected into a footer link.
 const urlOrBlank = z
   .string()
   .max(500)
   .trim()
   .refine((v) => v === '' || /^https?:\/\/.+/i.test(v), 'Must be a valid http(s) URL')
 
-const schema = z.object(
-  Object.fromEntries(SOCIAL_PLATFORMS.map((p) => [p.id, urlOrBlank.optional()])),
-)
+const rateField = z.coerce.number().int().min(1).max(1000).optional()
+
+const schema = z.object({
+  ...Object.fromEntries(SOCIAL_PLATFORMS.map((p) => [p.id, urlOrBlank.optional()])),
+  contactNpcName: z.string().max(32).trim().optional(),
+  expRate: rateField,
+  mesoRate: rateField,
+  dropRate: rateField,
+})
 
 export async function GET() {
   const session = await getServerSession(authOptions)
   if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 })
   if (session.user.webadmin !== 1) return Response.json({ error: 'Forbidden' }, { status: 403 })
 
-  return Response.json(await readSocialLinks())
+  const [social, general, rates] = await Promise.all([
+    readSocialLinks(),
+    readGeneralSettings(),
+    readServerRates(),
+  ])
+  return Response.json({ ...social, contactNpcName: general.contactNpcName, ...rates })
 }
 
 export async function PUT(req: NextRequest) {
@@ -39,27 +58,51 @@ export async function PUT(req: NextRequest) {
   const parsed = schema.safeParse(body)
   if (!parsed.success) return Response.json({ error: parsed.error.issues[0].message }, { status: 400 })
 
-  // Upsert each provided platform. Only keys present in the payload are touched,
-  // so a partial save leaves the others untouched.
+  const data = parsed.data as Record<string, string | number | undefined>
   try {
-    await prisma.$transaction(
-      SOCIAL_PLATFORMS.filter((p) => parsed.data[p.id] !== undefined).map((p) => {
-        const value = parsed.data[p.id] as string
+    const ops = [
+      ...SOCIAL_PLATFORMS.filter((p) => data[p.id] !== undefined).map((p) => {
+        const value = data[p.id] as string
         return prisma.cmsSetting.upsert({
           where: { key: p.key },
           create: { key: p.key, value },
           update: { value },
         })
       }),
-    )
+    ]
+    if (data.contactNpcName !== undefined) {
+      ops.push(
+        prisma.cmsSetting.upsert({
+          where: { key: CONTACT_NPC_NAME_KEY },
+          create: { key: CONTACT_NPC_NAME_KEY, value: data.contactNpcName as string },
+          update: { value: data.contactNpcName as string },
+        }),
+      )
+    }
+    const rateEntries: [string, string][] = []
+    if (data.expRate !== undefined) rateEntries.push([EXP_RATE_KEY, String(data.expRate)])
+    if (data.mesoRate !== undefined) rateEntries.push([MESO_RATE_KEY, String(data.mesoRate)])
+    if (data.dropRate !== undefined) rateEntries.push([DROP_RATE_KEY, String(data.dropRate)])
+    for (const [key, value] of rateEntries) {
+      ops.push(prisma.cmsSetting.upsert({ where: { key }, create: { key, value }, update: { value } }))
+    }
+    await prisma.$transaction(ops)
   } catch (err) {
     console.error('settings save failed', err)
     return Response.json({ error: 'Could not save settings. Please try again.' }, { status: 500 })
   }
 
-  // Invalidate the cached footer read so the new links show site-wide
-  // (stale-while-revalidate on the next visit to each page).
-  revalidateTag(SOCIAL_LINKS_TAG, 'max')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(revalidateTag as any)(SOCIAL_LINKS_TAG, 'max')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(revalidateTag as any)(GENERAL_SETTINGS_TAG, 'max')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(revalidateTag as any)(SERVER_RATES_TAG, 'max')
 
-  return Response.json(await readSocialLinks())
+  const [social, general, rates] = await Promise.all([
+    readSocialLinks(),
+    readGeneralSettings(),
+    readServerRates(),
+  ])
+  return Response.json({ ...social, contactNpcName: general.contactNpcName, ...rates })
 }

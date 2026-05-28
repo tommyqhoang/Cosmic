@@ -4,7 +4,7 @@ import NpcBox from '@/components/maple/NpcBox'
 import SectionBanner from '@/components/maple/SectionBanner'
 import StatBar from '@/components/maple/StatBar'
 import StatusBoard from '@/components/status/StatusBoard'
-import { getSocialLinks } from '@/lib/settings'
+import { getSocialLinks, getServerRates } from '@/lib/settings'
 
 export const metadata: Metadata = {
   title: 'Server Status',
@@ -19,8 +19,9 @@ export const metadata: Metadata = {
 }
 
 export default async function StatusPage() {
-  const social = await getSocialLinks()
-  const discordUrl = social.discord || 'https://discord.gg/jKueJFAErs'
+  const [social, rates] = await Promise.all([getSocialLinks(), getServerRates()])
+  const discordUrl = social.discord || null
+  const rateMax = Math.max(rates.expRate, rates.mesoRate, rates.dropRate, 10)
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14 relative">
       {/* Floating sprite decorations */}
@@ -110,9 +111,9 @@ export default async function StatusPage() {
               Server Rates
             </div>
             <div className="p-4 flex flex-col gap-3">
-              <StatBar kind="exp" label="EXP" value={7} max={10} displayValue="7×" />
-              <StatBar kind="hp" label="MESO" value={5} max={10} displayValue="5×" />
-              <StatBar kind="mp" label="DROP" value={3} max={10} displayValue="3×" />
+              <StatBar kind="exp" label="EXP" value={rates.expRate} max={rateMax} displayValue={`${rates.expRate}×`} />
+              <StatBar kind="hp" label="MESO" value={rates.mesoRate} max={rateMax} displayValue={`${rates.mesoRate}×`} />
+              <StatBar kind="mp" label="DROP" value={rates.dropRate} max={rateMax} displayValue={`${rates.dropRate}×`} />
               <p className="mt-1" style={{ fontFamily: 'var(--ms-font-b)', fontSize: 18, color: '#4a3220' }}>
                 Type <code style={{ fontFamily: 'var(--ms-font-d)', fontSize: 10, background: '#f0dfb0', padding: '2px 4px', border: '2px solid #2a1810' }}>@rates</code> in-game to confirm any active event boosts.
               </p>
@@ -137,9 +138,11 @@ export default async function StatusPage() {
             <div className="p-4" style={{ fontFamily: 'var(--ms-font-b)', fontSize: 20, color: 'var(--ms-text)' }}>
               <p className="mb-3" style={{ color: '#4a3220' }}>If the server shows online but you still can’t log in, reach out and we’ll help.</p>
               <div className="flex flex-col gap-2">
-                <a href={discordUrl} target="_blank" rel="noopener noreferrer" className="ms-btn ms-btn-sm">
-                  💬 Ask on Discord
-                </a>
+                {discordUrl && (
+                  <a href={discordUrl} target="_blank" rel="noopener noreferrer" className="ms-btn ms-btn-sm">
+                    💬 Ask on Discord
+                  </a>
+                )}
                 <Link href="/contact" className="ms-btn ms-btn-sm">
                   ✉️ Contact the team
                 </Link>

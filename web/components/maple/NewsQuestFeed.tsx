@@ -5,9 +5,25 @@ import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 import rehypeSanitize from 'rehype-sanitize'
 import remarkBreaks from 'remark-breaks'
+import useSWR from 'swr'
 import Sprite from './Sprite'
 import SectionBanner from './SectionBanner'
 import NpcBox from './NpcBox'
+
+const fetcher = (url: string) => fetch(url).then((r) => r.json())
+
+const JOB_AVATAR: Record<string, string> = {
+  Warrior: 'hero.png',
+  Mage: 'bishop.png',
+  Bowman: 'nightlord.png',
+  Thief: 'nightlord.png',
+  Pirate: 'hero.png',
+  Cygnus: 'bishop.png',
+  Aran: 'hero.png',
+}
+function jobAvatar(jobClass: string) {
+  return JOB_AVATAR[jobClass] ?? 'hero.png'
+}
 
 type Post = {
   id: number
@@ -246,8 +262,22 @@ function FilterTab({
 }
 
 /* ── Main Feed ── */
-export default function NewsQuestFeed({ posts }: { posts: Post[] }) {
+export default function NewsQuestFeed({ posts, discordUrl }: { posts: Post[]; discordUrl?: string }) {
   const [active, setActive] = useState<string>('all')
+
+  const { data: statusData } = useSWR<{ online: boolean; players: number }>(
+    '/api/server/status',
+    fetcher,
+    { refreshInterval: 30_000 },
+  )
+  const { data: topData } = useSWR<{ players: { name: string; level: number; jobName: string; jobClass: string }[] }>(
+    '/api/characters/top',
+    fetcher,
+    { refreshInterval: 120_000 },
+  )
+  const serverOnline = statusData?.online ?? null
+  const playerCount = statusData?.players ?? 0
+  const topPlayers = topData?.players ?? []
 
   const categories = useMemo(() => {
     const counts = posts.reduce<Record<string, number>>((acc, p) => {
@@ -337,31 +367,23 @@ export default function NewsQuestFeed({ posts }: { posts: Post[] }) {
           <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-5">
             <NpcBox title="SERVER STATUS">
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span>Server</span>
                   <span
                     style={{
-                      color: '#2e7a18',
+                      color: serverOnline === false ? '#e04040' : '#2e7a18',
                       fontFamily: 'var(--ms-font-d)',
                       fontSize: 10,
                     }}
                   >
-                    ONLINE
+                    {serverOnline === null ? '···' : serverOnline ? 'ONLINE' : 'OFFLINE'}
                   </span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>Players online</span>
-                  <strong style={{ color: '#c64b1b' }}>247</strong>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>Uptime</span>
-                  <strong>14d 6h</strong>
+                  <strong style={{ color: '#c64b1b' }}>
+                    {serverOnline === null ? '···' : playerCount}
+                  </strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>Version</span>
@@ -372,54 +394,48 @@ export default function NewsQuestFeed({ posts }: { posts: Post[] }) {
 
             <NpcBox title="TOP MAPLERS">
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {[
-                  { name: 'Reqei', job: 'Night Lord', lv: 142, cls: 'nightlord' as const, av: 'nightlord.png' },
-                  { name: 'Borin', job: 'Hero', lv: 155, cls: 'hero' as const, av: 'hero.png' },
-                  { name: 'Aelith', job: 'Bishop', lv: 120, cls: 'bishop' as const, av: 'bishop.png' },
-                ].map((p, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span
-                      style={{
-                        background: ['#f8c34a', '#c8c8c8', '#d8a878'][i],
-                        border: '2px solid #1a0a04',
-                        padding: '2px 6px',
-                        fontFamily: 'var(--ms-font-d)',
-                        fontSize: 10,
-                        boxShadow: '2px 2px 0 rgba(0,0,0,0.3)',
-                        flexShrink: 0,
-                      }}
-                    >
-                      #{i + 1}
-                    </span>
-                    <img
-                      src={`/maple/avatars/${p.av}`}
-                      alt=""
-                      style={{
-                        width: 36,
-                        height: 36,
-                        background: '#d8c08c',
-                        border: '2px solid #1a0a04',
-                        padding: 2,
-                        flexShrink: 0,
-                        imageRendering: 'pixelated',
-                      }}
-                    />
-                    <div>
-                      <div
+                {topPlayers.length === 0 ? (
+                  <p style={{ fontSize: 17, color: '#4a3220' }}>No players yet — be the first!</p>
+                ) : (
+                  topPlayers.map((p, i) => (
+                    <div key={p.name} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span
                         style={{
+                          background: ['#f8c34a', '#c8c8c8', '#d8a878'][i],
+                          border: '2px solid #1a0a04',
+                          padding: '2px 6px',
                           fontFamily: 'var(--ms-font-d)',
                           fontSize: 10,
-                          color: '#c64b1b',
+                          boxShadow: '2px 2px 0 rgba(0,0,0,0.3)',
+                          flexShrink: 0,
                         }}
                       >
-                        {p.name}
-                      </div>
-                      <div style={{ fontSize: 16 }}>
-                        {p.job} · Lv. {p.lv}
+                        #{i + 1}
+                      </span>
+                      <img
+                        src={`/maple/avatars/${jobAvatar(p.jobClass)}`}
+                        alt=""
+                        style={{
+                          width: 36,
+                          height: 36,
+                          background: '#d8c08c',
+                          border: '2px solid #1a0a04',
+                          padding: 2,
+                          flexShrink: 0,
+                          imageRendering: 'pixelated',
+                        }}
+                      />
+                      <div>
+                        <div style={{ fontFamily: 'var(--ms-font-d)', fontSize: 10, color: '#c64b1b' }}>
+                          {p.name}
+                        </div>
+                        <div style={{ fontSize: 16 }}>
+                          {p.jobName} · Lv. {p.level}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </NpcBox>
 
@@ -427,14 +443,7 @@ export default function NewsQuestFeed({ posts }: { posts: Post[] }) {
               <p style={{ fontSize: 19 }}>
                 Get news &amp; event alerts by email or Discord.
               </p>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 8,
-                  marginTop: 8,
-                }}
-              >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
                 <a
                   href="/#newsletter"
                   className="ms-btn ms-btn-green ms-btn-sm"
@@ -442,14 +451,17 @@ export default function NewsQuestFeed({ posts }: { posts: Post[] }) {
                 >
                   EMAIL
                 </a>
-                <a
-                  href="#"
-                  className="ms-btn ms-btn-sm"
-                  style={{ justifyContent: 'center' }}
-                  onClick={(e) => e.preventDefault()}
-                >
-                  DISCORD
-                </a>
+                {discordUrl && (
+                  <a
+                    href={discordUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ms-btn ms-btn-sm"
+                    style={{ justifyContent: 'center' }}
+                  >
+                    DISCORD
+                  </a>
+                )}
               </div>
             </NpcBox>
           </aside>

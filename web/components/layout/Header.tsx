@@ -5,6 +5,9 @@ import Image from 'next/image'
 import { useSession, signOut } from 'next-auth/react'
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
+import useSWR from 'swr'
+
+const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
 const NAV = [
   { href: '/', label: 'Home' },
@@ -19,6 +22,12 @@ export default function Header() {
   const { data: session } = useSession()
   const [menuOpen, setMenuOpen] = useState(false)
   const pathname = usePathname()
+  const { data: serverStatus } = useSWR<{ online: boolean; players: number }>(
+    '/api/server/status',
+    fetcher,
+    { refreshInterval: 30_000 },
+  )
+  const online = serverStatus?.online ?? null
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname.startsWith(href)
 
@@ -85,23 +94,24 @@ export default function Header() {
             style={{
               fontFamily: 'var(--ms-font-d)',
               fontSize: 9,
-              color: '#88f078',
+              color: online === false ? '#f87171' : '#88f078',
               padding: '4px 10px',
               background: 'rgba(0,0,0,0.4)',
-              border: '1px solid #2e7a18',
+              border: `1px solid ${online === false ? '#7a1818' : '#2e7a18'}`,
             }}
           >
             <span
               style={{
                 width: 8,
                 height: 8,
-                background: '#88f078',
-                boxShadow: '0 0 6px #88f078',
+                borderRadius: '50%',
+                background: online === false ? '#f87171' : '#88f078',
+                boxShadow: online !== false ? '0 0 6px #88f078' : 'none',
                 display: 'inline-block',
-                animation: 'pulse-dot 2s infinite',
+                animation: online !== false ? 'pulse-dot 2s infinite' : 'none',
               }}
             />
-            SERVER ONLINE
+            {online === false ? 'OFFLINE' : 'ONLINE'}
           </span>
 
           {session ? (

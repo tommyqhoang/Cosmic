@@ -16,7 +16,7 @@ import CharAvatar from '@/components/maple/CharAvatar'
 import InvPanel from '@/components/maple/InvPanel'
 import JobPicker from '@/components/maple/JobPicker'
 import { recentSmegas } from '@/lib/community'
-import { getSocialLinks } from '@/lib/settings'
+import { getSocialLinks, getServerRates } from '@/lib/settings'
 import type { Metadata } from 'next'
 
 // Render fresh on every request. The homepage shows live announcements +
@@ -31,14 +31,14 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://shinyms.com' },
 }
 
-async function buildJsonLd() {
+async function buildJsonLd(exp: number, meso: number, drop: number) {
   const social = await getSocialLinks()
   return {
     '@context': 'https://schema.org',
     '@type': 'VideoGame',
     name: 'ShinyMS',
     url: 'https://shinyms.com',
-    description: 'ShinyMS is a free MapleStory v83 private server with 7× EXP, 5× Meso & 3× Drop rates, playable instantly in your browser with no download.',
+    description: `ShinyMS is a free MapleStory v83 private server with ${exp}× EXP, ${meso}× Meso & ${drop}× Drop rates, playable instantly in your browser with no download.`,
     genre: ['MMORPG', 'Role-playing game'],
     gamePlatform: ['PC', 'Browser'],
     applicationCategory: 'Game',
@@ -54,43 +54,45 @@ async function buildJsonLd() {
   }
 }
 
-const faqLd = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: [
-    {
-      '@type': 'Question',
-      name: 'Is ShinyMS free to play?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Yes. ShinyMS is completely free to play with no pay-to-win mechanics. Everything is earned in-game — there is no cash shop power.',
+function buildFaqLd(exp: number, meso: number, drop: number) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'Is ShinyMS free to play?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Yes. ShinyMS is completely free to play with no pay-to-win mechanics. Everything is earned in-game — there is no cash shop power.',
+        },
       },
-    },
-    {
-      '@type': 'Question',
-      name: 'Do I need to download anything to play ShinyMS?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'No download or installer is required. You can play MapleStory v83 instantly in your browser on Windows, macOS, or Linux — just create a free account and click Play.',
+      {
+        '@type': 'Question',
+        name: 'Do I need to download anything to play ShinyMS?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'No download or installer is required. You can play MapleStory v83 instantly in your browser on Windows, macOS, or Linux — just create a free account and click Play.',
+        },
       },
-    },
-    {
-      '@type': 'Question',
-      name: 'What are the rates on ShinyMS?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'ShinyMS runs balanced rates of 7× EXP, 5× Meso, and 3× Drop on the classic GMS v83 version of MapleStory.',
+      {
+        '@type': 'Question',
+        name: 'What are the rates on ShinyMS?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `ShinyMS runs balanced rates of ${exp}× EXP, ${meso}× Meso, and ${drop}× Drop on the classic GMS v83 version of MapleStory.`,
+        },
       },
-    },
-    {
-      '@type': 'Question',
-      name: 'What version of MapleStory does ShinyMS run?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'ShinyMS runs the nostalgic GMS v83 version, preserving the classic towns, jobs, party quests, and bosses from the golden era of MapleStory.',
+      {
+        '@type': 'Question',
+        name: 'What version of MapleStory does ShinyMS run?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'ShinyMS runs the nostalgic GMS v83 version, preserving the classic towns, jobs, party quests, and bosses from the golden era of MapleStory.',
+        },
       },
-    },
-  ],
+    ],
+  }
 }
 
 async function getPosts() {
@@ -186,7 +188,10 @@ const OFFERS = [
 ]
 
 export default async function HomePage() {
-  const [posts, smegas, jsonLd] = await Promise.all([getPosts(), recentSmegas(15), buildJsonLd()])
+  const [posts, smegas, rates] = await Promise.all([getPosts(), recentSmegas(15), getServerRates()])
+  const { expRate: exp, mesoRate: meso, dropRate: drop } = rates
+  const rateMax = Math.max(exp, meso, drop, 10)
+  const [jsonLd, faqLd] = await Promise.all([buildJsonLd(exp, meso, drop), Promise.resolve(buildFaqLd(exp, meso, drop))])
 
   return (
     <div>
@@ -216,9 +221,9 @@ export default async function HomePage() {
               </p>
 
               <div className="flex flex-col gap-2 mb-6 max-w-xs">
-                <StatBar kind="hp" label="HP" value={7} max={10} displayValue="7× EXP" />
-                <StatBar kind="mp" label="MP" value={5} max={10} displayValue="5× Meso" />
-                <StatBar kind="exp" label="EXP" value={3} max={10} displayValue="3× Drop" />
+                <StatBar kind="hp" label="HP" value={exp} max={rateMax} displayValue={`${exp}× EXP`} />
+                <StatBar kind="mp" label="MP" value={meso} max={rateMax} displayValue={`${meso}× Meso`} />
+                <StatBar kind="exp" label="EXP" value={drop} max={rateMax} displayValue={`${drop}× Drop`} />
               </div>
 
               <div className="flex flex-wrap gap-3">
@@ -248,7 +253,7 @@ export default async function HomePage() {
                   preserved with care and running live in your browser.
                 </p>
                 <p style={{ marginTop: 8 }}>
-                  7× EXP · 5× Meso · 3× Drop. No pay-to-win. Just pure nostalgia.
+                  {exp}× EXP · {meso}× Meso · {drop}× Drop. No pay-to-win. Just pure nostalgia.
                 </p>
               </NpcBox>
             </div>
@@ -277,7 +282,7 @@ export default async function HomePage() {
               },
               {
                 title: 'Fair Rates',
-                body: 'Balanced 7× EXP, 5× Meso & 3× Drop. Everything is earned in-game — no cash shop power, ever.',
+                body: `Balanced ${exp}× EXP, ${meso}× Meso & ${drop}× Drop. Everything is earned in-game — no cash shop power, ever.`,
                 cls: 'warrior',
               },
               {
