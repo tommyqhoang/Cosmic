@@ -16,9 +16,6 @@ type InvItem = {
 
 const ITEMS: Record<Tab, InvItem[]> = {
   EQUIP: [
-    { icon: '/maple/items/maple-leaf.png', name: 'Maple Leaf', rarity: 'Common', desc: 'A shiny maple leaf.' },
-    { icon: '/maple/items/blue-snail-shell.png', name: 'Power Crystal', rarity: 'Rare', desc: '+10 ATT equipment crystal.' },
-    { icon: '/maple/items/red-snail-shell.png', name: 'Dark Crystal', rarity: 'Epic', desc: 'Pure dark energy.' },
     { icon: '/maple/items/maple-leaf.png', name: 'Warrior Hat', rarity: 'Uncommon', desc: 'Iron helm of the warrior.' },
     { icon: '/maple/items/maple-leaf.png', name: 'Battle Axe', rarity: 'Uncommon', desc: 'Heavy and powerful.' },
     { icon: '/maple/items/blue-snail-shell.png', name: 'Blue Robe', rarity: 'Common', desc: 'Mage attire.' },
@@ -33,23 +30,28 @@ const ITEMS: Record<Tab, InvItem[]> = {
     { icon: '/maple/items/blue-potion.png', name: 'All Cure Potion', rarity: 'Common', desc: 'Cures all status effects.', count: 15 },
     { icon: '/maple/items/blue-potion.png', name: 'Teleport Rock', rarity: 'Uncommon', desc: 'Teleport to any location.', count: 5 },
     { icon: '/maple/items/white-potion.png', name: 'Safety Charm', rarity: 'Rare', desc: 'Prevents one death.', count: 3 },
-    { icon: '/maple/items/maple-leaf.png', name: 'Meso Sack', rarity: 'Common', desc: '10,000 mesos inside.', count: 12 },
+    { icon: '/maple/items/white-potion.png', name: 'Magnifying Glass', rarity: 'Common', desc: 'Identifies equipment stats.', count: 8 },
   ],
   SETUP: [
     { icon: '/maple/items/red-potion.png', name: 'Hired Merchant', rarity: 'Common', desc: 'Set up a shop for 24 hours.' },
-    { icon: '/maple/items/maple-leaf.png', name: 'Item Lock', rarity: 'Uncommon', desc: 'Lock an equip permanently.' },
-    { icon: '/maple/items/white-potion.png', name: 'Magnifying Glass', rarity: 'Common', desc: 'Reveal hidden stats.' },
+    { icon: '/maple/items/blue-potion.png', name: 'Vending Machine', rarity: 'Common', desc: 'Unmanned shop for 7 days.' },
+    { icon: '/maple/items/white-potion.png', name: 'Kiosk', rarity: 'Common', desc: 'Trade post for 3 days.' },
   ],
   ETC: [
+    { icon: '/maple/items/maple-leaf.png', name: 'Maple Leaf', count: 50, rarity: 'Common', desc: 'A shiny maple leaf. Used in quests.' },
+    { icon: '/maple/items/blue-snail-shell.png', name: 'Power Crystal Ore', count: 18, rarity: 'Rare', desc: 'Refined into Power Crystal.' },
+    { icon: '/maple/items/red-snail-shell.png', name: 'Dark Crystal Ore', count: 5, rarity: 'Epic', desc: 'Refined into Dark Crystal.' },
     { icon: '/maple/items/maple-leaf.png', name: 'Mixed Golem Rock', count: 207, rarity: 'Common', desc: 'Monster drop.' },
     { icon: '/maple/items/red-snail-shell.png', name: 'Eye of Fire', count: 88, rarity: 'Uncommon', desc: 'Boss drop material.' },
     { icon: '/maple/items/blue-snail-shell.png', name: 'Piece of Ice', count: 44, rarity: 'Common', desc: 'Monster drop material.' },
     { icon: '/maple/items/maple-leaf.png', name: 'Zombie Tooth', count: 120, rarity: 'Common', desc: 'Monster drop.' },
+    { icon: '/maple/items/maple-leaf.png', name: 'Meso Sack', count: 12, rarity: 'Common', desc: '10,000 mesos inside.' },
   ],
   CASH: [
     { icon: '/maple/items/red-potion.png', name: 'Smega', rarity: 'Cash', desc: 'Broadcast across all channels.', count: 5 },
     { icon: '/maple/items/blue-potion.png', name: 'Name Change', rarity: 'Cash', desc: 'Change your character name.' },
     { icon: '/maple/items/maple-leaf.png', name: 'Owl of Minerva', rarity: 'Cash', desc: 'Search Hired Merchants.', count: 10 },
+    { icon: '/maple/items/white-potion.png', name: 'Item Lock', rarity: 'Cash', desc: 'Lock an equip permanently.' },
   ],
 }
 

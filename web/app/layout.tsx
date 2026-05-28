@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     default: 'ShinyMS — Free MapleStory v83 Private Server',
     template: '%s | ShinyMS',
   },
-  description: 'ShinyMS is a free MapleStory v83 private server with 7× EXP, 5× Meso & 3× Drop rates. Relive the golden era of MapleStory — no pay-to-win, just pure nostalgia.',
+  description: 'ShinyMS is a free MapleStory v83 private server. Relive the golden era of MapleStory — no pay-to-win, no download, just pure nostalgia.',
   keywords: [
     'MapleStory private server', 'MapleStory v83', 'ShinyMS', 'free MMORPG',
     'MapleStory GMS', 'old MapleStory', 'nostalgia MapleStory', 'maplestory 2025',
@@ -63,13 +63,13 @@ export const metadata: Metadata = {
     url: 'https://shinyms.com',
     siteName: 'ShinyMS',
     title: 'ShinyMS — Free MapleStory v83 Private Server',
-    description: 'ShinyMS is a free MapleStory v83 private server with 7× EXP, 5× Meso & 3× Drop rates. Relive the golden era — no pay-to-win.',
+    description: 'ShinyMS is a free MapleStory v83 private server. Relive the golden era — no pay-to-win, no download.',
     images: [{ url: '/shinyms-logo.png', width: 1254, height: 1254, alt: 'ShinyMS — MapleStory v83 Private Server' }],
   },
   twitter: {
     card: 'summary',
     title: 'ShinyMS — Free MapleStory v83 Private Server',
-    description: 'Free MapleStory v83 private server. 7× EXP, 5× Meso & 3× Drop, no pay-to-win.',
+    description: 'Free MapleStory v83 private server. No pay-to-win, no download — play instantly in your browser.',
     images: ['/shinyms-logo.png'],
   },
   icons: {

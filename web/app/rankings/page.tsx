@@ -163,6 +163,7 @@ export default async function RankingsPage({
             name="q"
             defaultValue={query}
             placeholder="Search for a player by character name..."
+            aria-label="Search players by character name"
             autoComplete="off"
             className="w-full"
             style={{

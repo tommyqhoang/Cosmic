@@ -9,6 +9,7 @@ import {
   resolveItemNames, resolveMobNames,
 } from '@/lib/maplestory'
 
+// force-dynamic: page reads searchParams (q, mode) on every request.
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
@@ -248,6 +249,7 @@ export default async function DropsPage({
       <form method="GET" action="/drops" className="flex flex-col sm:flex-row gap-3 mb-8">
         <input type="hidden" name="mode" value={mode} />
         <input name="q" defaultValue={query} autoComplete="off"
+          aria-label={mode === 'item' ? 'Search by item name or ID' : 'Search by monster name or ID'}
           placeholder={mode === 'item' ? 'Item name or ID — e.g. Maple Sword, 1302063' : 'Monster name or ID — e.g. Orange Mushroom, 100100'}
           className="flex-1 px-4 py-2.5"
           style={{

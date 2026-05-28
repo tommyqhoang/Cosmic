@@ -54,6 +54,7 @@ export default function ChangePasswordForm() {
       <form onSubmit={handleSubmit} className="p-5 flex flex-col gap-3">
         {status && (
           <div
+            role="alert"
             className="rounded-lg px-4 py-3 text-sm"
             style={{
               backgroundColor: status.type === 'success' ? 'var(--success-subtle)' : 'var(--destructive-subtle)',
@@ -65,8 +66,9 @@ export default function ChangePasswordForm() {
           </div>
         )}
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium" style={{ color: 'var(--foreground-subtle)' }}>Current Password</label>
+          <label htmlFor="cp-current" className="text-xs font-medium" style={{ color: 'var(--foreground-subtle)' }}>Current Password</label>
           <input
+            id="cp-current"
             type="password"
             value={form.currentPassword}
             onChange={e => setForm(f => ({ ...f, currentPassword: e.target.value }))}
@@ -79,8 +81,9 @@ export default function ChangePasswordForm() {
           />
         </div>
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium" style={{ color: 'var(--foreground-subtle)' }}>New Password</label>
+          <label htmlFor="cp-new" className="text-xs font-medium" style={{ color: 'var(--foreground-subtle)' }}>New Password</label>
           <input
+            id="cp-new"
             type="password"
             value={form.newPassword}
             onChange={e => setForm(f => ({ ...f, newPassword: e.target.value }))}
@@ -94,8 +97,9 @@ export default function ChangePasswordForm() {
           />
         </div>
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium" style={{ color: 'var(--foreground-subtle)' }}>Confirm New Password</label>
+          <label htmlFor="cp-confirm" className="text-xs font-medium" style={{ color: 'var(--foreground-subtle)' }}>Confirm New Password</label>
           <input
+            id="cp-confirm"
             type="password"
             value={form.confirmPassword}
             onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}

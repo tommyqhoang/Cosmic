@@ -145,6 +145,7 @@ export default async function GuildsPage({
           name="q"
           defaultValue={query}
           placeholder="Search for a guild by name…"
+          aria-label="Search guilds by name"
           autoComplete="off"
           className="flex-1 px-4 py-2.5"
           style={{
