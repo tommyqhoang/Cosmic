@@ -32,7 +32,7 @@ export default function UnsubscribeForm({ token }: { token: string }) {
 
   if (!token) {
     return (
-      <p className="text-sm" style={{ color: 'var(--destructive)' }}>
+      <p style={{ fontFamily: 'var(--ms-font-b)', fontSize: 18, color: '#c03a2b' }}>
         This unsubscribe link is invalid or incomplete. Please use the link from the bottom of one of our emails.
       </p>
     )
@@ -41,10 +41,17 @@ export default function UnsubscribeForm({ token }: { token: string }) {
   if (status === 'done') {
     return (
       <div className="text-center">
-        <p className="text-sm mb-4" style={{ color: 'var(--foreground-muted)' }}>
+        <p
+          className="mb-4"
+          style={{ fontFamily: 'var(--ms-font-b)', fontSize: 18, color: '#5a4a30' }}
+        >
           You&rsquo;ve been unsubscribed. You won&rsquo;t receive any more announcement emails from ShinyMS.
         </p>
-        <Link href="/" className="text-sm font-semibold" style={{ color: 'var(--primary)' }}>
+        <Link
+          href="/"
+          className="ms-btn ms-btn-sm"
+          style={{ textDecoration: 'none', display: 'inline-block' }}
+        >
           Back to homepage →
         </Link>
       </div>
@@ -53,19 +60,22 @@ export default function UnsubscribeForm({ token }: { token: string }) {
 
   return (
     <div className="text-center">
-      <p className="text-sm mb-5" style={{ color: 'var(--foreground-muted)' }}>
+      <p
+        className="mb-5"
+        style={{ fontFamily: 'var(--ms-font-b)', fontSize: 18, color: '#5a4a30' }}
+      >
         Unsubscribe from ShinyMS announcement emails? You can re-subscribe any time from the homepage.
       </p>
       {error && (
-        <p className="text-sm mb-4" style={{ color: 'var(--destructive)' }}>{error}</p>
+        <p className="mb-4" style={{ fontFamily: 'var(--ms-font-b)', fontSize: 18, color: '#c03a2b' }}>
+          {error}
+        </p>
       )}
       <button
         onClick={unsubscribe}
         disabled={status === 'loading'}
-        className="w-full rounded-lg py-2.5 text-sm font-semibold transition-all duration-150"
+        className="ms-btn"
         style={{
-          backgroundColor: 'var(--destructive)',
-          color: '#fff',
           opacity: status === 'loading' ? 0.6 : 1,
           cursor: status === 'loading' ? 'not-allowed' : 'pointer',
         }}

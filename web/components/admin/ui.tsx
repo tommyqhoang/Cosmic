@@ -33,12 +33,17 @@ export function Button({ variant = 'primary', size = 'md', className, style, typ
     <button
       type={type}
       className={cn(
-        'inline-flex items-center justify-center rounded-lg font-semibold transition-colors duration-150',
+        'inline-flex items-center justify-center rounded font-semibold transition-colors duration-150',
         'disabled:opacity-60 disabled:cursor-not-allowed',
         SIZE_CLS[size],
         className,
       )}
-      style={{ ...VARIANT_STYLE[variant], ...style }}
+      style={{
+        fontFamily: 'var(--ms-font-b)',
+        fontSize: size === 'sm' ? 16 : 18,
+        ...VARIANT_STYLE[variant],
+        ...style,
+      }}
       {...rest}
     />
   )
@@ -53,9 +58,9 @@ export function CardHeader({ title, action }: { title: ReactNode; action?: React
   return (
     <div
       className="flex items-center justify-between px-5 py-3.5"
-      style={{ borderBottom: '1px solid var(--border-subtle)', backgroundColor: 'var(--surface-subtle)' }}
+      style={{ borderBottom: '2px solid #5a3e2a', background: 'linear-gradient(to bottom, #3a5a8a 0%, #2a4060 100%)' }}
     >
-      <h2 className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>{title}</h2>
+      <h2 style={{ fontFamily: 'var(--ms-font-d)', fontSize: 10, color: '#fff8d8', letterSpacing: 1 }}>{title}</h2>
       {action}
     </div>
   )
@@ -66,10 +71,10 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
-        <h1 className="font-display font-bold text-xl sm:text-2xl" style={{ color: 'var(--foreground)', letterSpacing: '0.02em' }}>
+        <h1 style={{ fontFamily: 'var(--ms-font-d)', fontSize: 12, color: '#3a2418', letterSpacing: 1 }}>
           {title}
         </h1>
-        {subtitle && <p className="text-xs sm:text-sm mt-0.5" style={{ color: 'var(--foreground-subtle)' }}>{subtitle}</p>}
+        {subtitle && <p style={{ fontFamily: 'var(--ms-font-b)', fontSize: 18, color: '#7a5a3a', marginTop: 4 }}>{subtitle}</p>}
       </div>
       {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
     </div>
@@ -80,10 +85,10 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
 export function Field({ label, htmlFor, error, hint, children }: { label: string; htmlFor: string; error?: string | null; hint?: ReactNode; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={htmlFor} className="text-xs font-semibold" style={{ color: 'var(--foreground-muted)' }}>{label}</label>
+      <label htmlFor={htmlFor} style={{ fontFamily: 'var(--ms-font-b)', fontSize: 18, color: '#5a4a30' }}>{label}</label>
       {children}
-      {hint && !error && <p className="text-xs" style={{ color: 'var(--foreground-subtle)' }}>{hint}</p>}
-      {error && <p className="text-xs" style={{ color: 'var(--destructive)' }} role="alert">{error}</p>}
+      {hint && !error && <p style={{ fontFamily: 'var(--ms-font-b)', fontSize: 16, color: '#7a5a3a' }}>{hint}</p>}
+      {error && <p style={{ fontFamily: 'var(--ms-font-b)', fontSize: 16, color: '#c03a2b' }} role="alert">{error}</p>}
     </div>
   )
 }

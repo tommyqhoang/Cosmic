@@ -19,23 +19,73 @@ export default async function UnsubscribePage({
   return (
     <AuthBackdrop>
       <div
-        className="rounded-2xl p-8 max-w-sm w-full"
+        className="w-full max-w-sm mx-auto"
         style={{
-          backgroundColor: 'var(--surface)',
-          border: '2px solid #2a4a73',
-          boxShadow: 'inset 0 0 0 2px rgba(255,255,255,0.7), 0 16px 40px -12px rgba(26,58,92,0.5)',
+          background: 'linear-gradient(to bottom, #f8efd0 0%, #e8dcc0 100%)',
+          border: '3px solid #5a3e2a',
+          boxShadow: 'inset 0 0 0 2px #fff, 4px 4px 0 rgba(0,0,0,0.25)',
+          imageRendering: 'pixelated',
         }}
       >
-        <div className="text-center mb-6">
-          <div className="flex justify-center mb-2">
-            <Sprite src="/maple/mobs/red-snail.gif" alt="" height={52} anim="hop" grounded={false} />
-          </div>
-          <div className="font-display font-bold text-base mb-1" style={{ color: 'var(--navy)', letterSpacing: '0.04em' }}>
-            ShinyMS
-          </div>
-          <h1 className="text-xl font-bold font-display" style={{ color: 'var(--foreground)' }}>Email Preferences</h1>
+        {/* Pixel title bar like NPC box */}
+        <div
+          className="px-4 py-2 flex items-center gap-2"
+          style={{
+            background: 'linear-gradient(to bottom, #3a5a8a 0%, #2a4060 100%)',
+            borderBottom: '2px solid #5a3e2a',
+          }}
+        >
+          <Sprite
+            src="/maple/items/maple-leaf.png"
+            alt=""
+            height={16}
+            grounded={false}
+          />
+          <span
+            style={{
+              fontFamily: 'var(--ms-font-d)',
+              fontSize: 10,
+              color: '#fff8d8',
+              letterSpacing: 1,
+            }}
+          >
+            EMAIL PREFERENCES
+          </span>
         </div>
-        <UnsubscribeForm token={token} />
+
+        <div className="px-5 py-6 text-center">
+          <div className="flex justify-center mb-3">
+            <Sprite
+              src="/maple/mobs/red-snail.gif"
+              alt=""
+              height={48}
+              anim="hop"
+              grounded={false}
+            />
+          </div>
+          <h1
+            style={{
+              fontFamily: 'var(--ms-font-d)',
+              fontSize: 12,
+              color: '#3a2418',
+              letterSpacing: 1,
+              margin: '0 0 8px',
+            }}
+          >
+            ShinyMS
+          </h1>
+          <p
+            style={{
+              fontFamily: 'var(--ms-font-b)',
+              fontSize: 20,
+              color: '#5a4a30',
+              margin: '0 0 12px',
+            }}
+          >
+            Email Preferences
+          </p>
+          <UnsubscribeForm token={token} />
+        </div>
       </div>
     </AuthBackdrop>
   )

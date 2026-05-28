@@ -73,8 +73,9 @@ function renderBody(markdown: string): string {
 // header band with the slime mascot + ShinyMS wordmark, then the body, then a
 // grassy footer strip with a friendly sign-off. `body` is trusted HTML built by
 // the caller; `footerNote` is the small print under the grass.
-function shell(body: string, footerNote: string): string {
+function shell(body: string, footerNote: string, discordInvite?: string): string {
   const url = siteUrl()
+  const invite = discordInvite?.trim() || DISCORD_INVITE
   return `<!doctype html>
 <html>
   <body style="margin:0;padding:0;background:#dcebf8;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">
@@ -93,7 +94,7 @@ function shell(body: string, footerNote: string): string {
           <tr><td style="padding:28px">${body}</td></tr>
           <!-- Footer -->
           <tr><td style="padding:18px 28px;border-top:1px solid #e6edf5;background:#f5f9fd">
-            <p style="margin:0 0 6px;font-size:13px;color:#5a6a82">🍄 See you in Maple World — <a href="${DISCORD_INVITE}" style="color:#5865F2;text-decoration:none;font-weight:600">join us on Discord</a></p>
+            <p style="margin:0 0 6px;font-size:13px;color:#5a6a82">🍄 See you in Maple World — <a href="${invite}" style="color:#5865F2;text-decoration:none;font-weight:600">join us on Discord</a></p>
             <p style="margin:0;font-size:12px;line-height:1.6;color:#9aa6b8">${footerNote}</p>
           </td></tr>
         </table>
@@ -104,7 +105,7 @@ function shell(body: string, footerNote: string): string {
 </html>`
 }
 
-function announcementHtml(post: { title: string; content: string; category: string }, token: string): string {
+function announcementHtml(post: { title: string; content: string; category: string }, token: string, discordInvite?: string): string {
   const unsub = unsubscribeUrl(token)
   const url = siteUrl()
   const cat = categoryMeta(post.category)
@@ -118,10 +119,10 @@ function announcementHtml(post: { title: string; content: string; category: stri
       </td></tr>
     </table>`
   const footer = `You're getting this because you subscribed to ShinyMS announcements. <a href="${unsub}" style="color:#9aa6b8;text-decoration:underline">Unsubscribe</a>`
-  return shell(body, footer)
+  return shell(body, footer, discordInvite)
 }
 
-function welcomeHtml(token: string): string {
+function welcomeHtml(token: string, discordInvite?: string): string {
   const unsub = unsubscribeUrl(token)
   const url = siteUrl()
   const body = `
@@ -134,17 +135,17 @@ function welcomeHtml(token: string): string {
       </td></tr>
     </table>`
   const footer = `Changed your mind? <a href="${unsub}" style="color:#9aa6b8;text-decoration:underline">Unsubscribe</a> anytime — no hard feelings.`
-  return shell(body, footer)
+  return shell(body, footer, discordInvite)
 }
 
-export async function sendWelcomeEmail(to: string, token: string): Promise<void> {
+export async function sendWelcomeEmail(to: string, token: string, discordInvite?: string): Promise<void> {
   if (!resend) return
   try {
     await resend.emails.send({
       from: FROM,
       to,
       subject: '🍄 Welcome to ShinyMS announcements!',
-      html: welcomeHtml(token),
+      html: welcomeHtml(token, discordInvite),
       headers: { 'List-Unsubscribe': `<${unsubscribeUrl(token)}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' },
     })
   } catch (err) {
@@ -158,7 +159,7 @@ type AnnouncementPost = { title: string; content: string; category: string }
 // Sends one announcement email per active subscriber. Resend's batch endpoint
 // accepts up to 100 distinct messages per call, so we chunk. Each message carries
 // the recipient's own unsubscribe token. Returns how many were dispatched.
-export async function sendAnnouncementEmails(post: AnnouncementPost, subscribers: Subscriber[]): Promise<number> {
+export async function sendAnnouncementEmails(post: AnnouncementPost, subscribers: Subscriber[], discordInvite?: string): Promise<number> {
   if (!resend || subscribers.length === 0) return 0
 
   const cat = categoryMeta(post.category)
@@ -171,7 +172,7 @@ export async function sendAnnouncementEmails(post: AnnouncementPost, subscribers
       from: FROM,
       to: sub.email,
       subject,
-      html: announcementHtml(post, sub.token),
+      html: announcementHtml(post, sub.token, discordInvite),
       headers: {
         'List-Unsubscribe': `<${unsubscribeUrl(sub.token)}>`,
         'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',

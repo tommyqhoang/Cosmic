@@ -69,10 +69,14 @@ function NavList({ pathname, onNavigate }: { pathname: string; onNavigate?: () =
             href={href}
             onClick={onNavigate}
             aria-current={active ? 'page' : undefined}
-            className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium nav-link"
+            className="flex items-center gap-2.5 px-3 py-2.5 nav-link"
             style={{
-              color: active ? 'var(--primary)' : 'var(--foreground-muted)',
-              backgroundColor: active ? 'var(--primary-subtle)' : 'transparent',
+              fontFamily: 'var(--ms-font-b)',
+              fontSize: 18,
+              color: active ? '#f8c34a' : '#d8c08c',
+              backgroundColor: active ? 'rgba(248,195,74,0.15)' : 'transparent',
+              border: active ? '2px solid #f8c34a' : '2px solid transparent',
+              textDecoration: 'none',
             }}
           >
             {icon}
@@ -88,8 +92,13 @@ function BackToSite() {
   return (
     <Link
       href="/"
-      className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium nav-link"
-      style={{ color: 'var(--foreground-subtle)' }}
+      className="flex items-center gap-2 px-3 py-2 nav-link"
+      style={{
+        fontFamily: 'var(--ms-font-b)',
+        fontSize: 16,
+        color: '#a89060',
+        textDecoration: 'none',
+      }}
     >
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
@@ -101,8 +110,29 @@ function BackToSite() {
 
 const BRAND = (
   <div className="flex items-center gap-2 px-1">
-    <span className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold" style={{ backgroundColor: 'var(--primary)', color: '#fff' }}>S</span>
-    <span className="font-display font-bold text-sm tracking-wide" style={{ color: 'var(--foreground)' }}>ShinyMS Admin</span>
+    <span
+      className="w-7 h-7 flex items-center justify-center"
+      style={{
+        background: 'linear-gradient(to bottom, #f8c34a 0%, #e2a020 100%)',
+        color: '#2a1810',
+        fontFamily: 'var(--ms-font-d)',
+        fontSize: 10,
+        border: '2px solid #5a3e2a',
+        boxShadow: 'inset 0 0 0 1px #fff',
+      }}
+    >
+      S
+    </span>
+    <span
+      style={{
+        fontFamily: 'var(--ms-font-d)',
+        fontSize: 10,
+        color: '#3a2418',
+        letterSpacing: 1,
+      }}
+    >
+      SHINYMS ADMIN
+    </span>
   </div>
 )
 

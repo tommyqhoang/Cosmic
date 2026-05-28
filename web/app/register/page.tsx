@@ -1,15 +1,37 @@
 'use client'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Turnstile from '@/components/Turnstile'
 import AuthBackdrop from '@/components/maple/AuthBackdrop'
-import Sprite from '@/components/maple/Sprite'
+import SectionBanner from '@/components/maple/SectionBanner'
+import NpcBox from '@/components/maple/NpcBox'
 
 type Field = 'name' | 'password' | 'confirm' | 'email' | 'birthday'
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
+
+function passwordStrength(p: string) {
+  let s = 0
+  if (p.length >= 6) s++
+  if (p.length >= 10) s++
+  if (/[A-Z]/.test(p) && /[a-z]/.test(p)) s++
+  if (/[0-9]/.test(p)) s++
+  if (/[^A-Za-z0-9]/.test(p)) s++
+  return s
+}
+
+const STRENGTH_LABEL = ['', 'Weak', 'OK', 'Good', 'Strong', 'Excellent']
+const STRENGTH_COLOR = ['#8a6f3c', '#c64b1b', '#e2a020', '#c08820', '#4caf30', '#2e7a18']
+
+function validateName(n: string) {
+  if (!n) return ''
+  if (n.length < 4) return 'Too short (4 min).'
+  if (n.length > 13) return 'Too long (13 max).'
+  if (!/^[a-zA-Z0-9_]+$/.test(n)) return 'Letters, numbers, _ only.'
+  return ''
+}
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -20,24 +42,25 @@ export default function RegisterPage() {
   const [captchaToken, setCaptchaToken] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({})
+  const [showPassword, setShowPassword] = useState(false)
 
   const captchaRequired = Boolean(TURNSTILE_SITE_KEY)
   const canSubmit = agreed && (!captchaRequired || captchaToken !== '') && !loading
 
   const update = (field: Field, value: string) => setForm(f => ({ ...f, [field]: value }))
+  const blur = (field: Field) => setTouched(t => ({ ...t, [field]: true }))
 
-  const inputStyle = {
-    border: '1px solid var(--border)',
-    backgroundColor: 'var(--surface)',
-    color: 'var(--foreground)',
-    outline: 'none',
-  }
-  const onFocus = (e: React.FocusEvent<HTMLInputElement>) => (e.currentTarget.style.borderColor = 'var(--primary)')
-  const onBlur  = (e: React.FocusEvent<HTMLInputElement>) => (e.currentTarget.style.borderColor = 'var(--border)')
+  const nameErr = useMemo(() => validateName(form.name), [form.name])
+  const pwdScore = useMemo(() => passwordStrength(form.password), [form.password])
+  const pwdErr = form.password && form.password.length < 6 ? 'Min. 6 characters.' : ''
+  const confirmErr = form.confirm && form.confirm !== form.password ? 'Passwords do not match.' : ''
+  const emailErr = form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) ? 'Check your email format.' : ''
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
+    setTouched({ name: true, password: true, confirm: true, email: true, birthday: true })
     if (form.password !== form.confirm) { setError('Passwords do not match.'); return }
     if (form.password.length < 6) { setError('Password must be at least 6 characters.'); return }
     if (!agreed) { setError('You must agree to the Terms of Service and Privacy Policy.'); return }
@@ -79,109 +102,289 @@ export default function RegisterPage() {
   }
 
   return (
-    <AuthBackdrop>
-        <div
-          className="rounded-2xl p-8"
-          style={{
-            backgroundColor: 'var(--surface)',
-            border: '2px solid #2a4a73',
-            boxShadow: 'inset 0 0 0 2px rgba(255,255,255,0.7), 0 16px 40px -12px rgba(26,58,92,0.5)',
-          }}
-        >
-          <div className="text-center mb-6">
-            <div className="flex justify-center mb-2">
-              <Sprite src="/maple/mobs/slime.gif" alt="" height={52} anim="hop" grounded={false} />
-            </div>
-            <div className="font-display font-bold text-base mb-1" style={{ color: 'var(--navy)', letterSpacing: '0.04em' }}>
-              ShinyMS
-            </div>
-            <h1 className="text-xl font-bold font-display" style={{ color: 'var(--foreground)' }}>Create Account</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--foreground-subtle)' }}>
-              Join for free — jump straight into the game in your browser
-            </p>
+    <AuthBackdrop className="max-w-2xl">
+      {/* Floating sprites */}
+      <img
+        src="/maple/mobs/slime.gif"
+        alt=""
+        className="sprite sprite-bob absolute pointer-events-none"
+        style={{ top: 24, left: '6%', width: 56, height: 'auto', zIndex: 5 }}
+      />
+      <img
+        src="/maple/mobs/pig.gif"
+        alt=""
+        className="sprite sprite-bob absolute pointer-events-none"
+        style={{ top: 70, right: '8%', width: 48, height: 'auto', animationDelay: '0.4s', zIndex: 5 }}
+      />
+      <img
+        src="/maple/mobs/orange-mushroom.gif"
+        alt=""
+        className="sprite sprite-hop absolute pointer-events-none"
+        style={{ bottom: 100, left: '12%', width: 44, height: 'auto', animationDelay: '0.8s', zIndex: 5 }}
+      />
+      <img
+        src="/maple/mobs/snail.gif"
+        alt=""
+        className="sprite sprite-bob absolute pointer-events-none"
+        style={{ bottom: 110, right: '14%', width: 38, height: 'auto', animationDelay: '1.2s', zIndex: 5 }}
+      />
+
+      <div className="relative z-10 w-full flex flex-col items-center">
+        {/* Hero */}
+        <div className="text-center mb-6 px-4">
+          <SectionBanner>WELCOME · NEW ADVENTURER</SectionBanner>
+          <h1 className="ms-hero-title">Create your account</h1>
+          <div className="mt-3 mb-6">
+            <span className="ms-hero-sub">
+              Pick a name. Pick a password. You&apos;re playing in thirty seconds.
+            </span>
           </div>
+        </div>
 
-          {error && (
-            <div
-              className="rounded-lg px-4 py-3 text-sm mb-5"
-              style={{ backgroundColor: 'var(--destructive-subtle)', color: 'var(--destructive)', border: '1px solid var(--destructive-border)' }}
-            >
-              {error}
-            </div>
-          )}
+        {/* Form inside NPC box */}
+        <div className="w-full px-4 pb-8">
+          <NpcBox title="CREATE AN ACCOUNT" npcName="Maple Admin" npcCls="gm">
+            <p className="mb-3" style={{ fontFamily: 'var(--ms-font-b)', fontSize: 21, lineHeight: 1.3, color: 'var(--ms-text)' }}>
+              Pick a name and password. You&apos;ll be in Henesys within thirty seconds.
+              Free forever, no pay-to-win.
+            </p>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            {([
-              { field: 'name' as Field, label: 'Username', type: 'text', placeholder: '4–13 characters', extra: { minLength: 4, maxLength: 13, autoFocus: true } },
-              { field: 'password' as Field, label: 'Password', type: 'password', placeholder: 'Min. 6 characters', extra: { minLength: 6 } },
-              { field: 'confirm' as Field, label: 'Confirm Password', type: 'password', placeholder: '', extra: {} },
-              { field: 'email' as Field, label: 'Email', type: 'email', placeholder: 'you@example.com', extra: { required: true } },
-              { field: 'birthday' as Field, label: 'Birthday', type: 'date', placeholder: '', extra: { required: true } },
-            ] as const).map(({ field, label, type, placeholder, extra }) => (
-              <div key={field}>
-                <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--foreground-muted)' }}>
-                  {label}
-                </label>
-                <input
-                  type={type}
-                  value={form[field]}
-                  onChange={e => update(field, e.target.value)}
-                  onFocus={onFocus}
-                  onBlur={onBlur}
-                  placeholder={placeholder}
-                  className="w-full rounded-lg px-3.5 py-2.5 text-sm transition-all duration-150"
-                  style={inputStyle}
-                  required
-                  {...extra}
-                />
+            {error && (
+              <div
+                className="mb-3 px-4 py-2"
+                style={{
+                  background: '#fef2f2',
+                  border: '2px solid #b91c1c',
+                  color: '#b91c1c',
+                  fontFamily: 'var(--ms-font-b)',
+                  fontSize: 18,
+                }}
+              >
+                ⚠ {error}
               </div>
-            ))}
-
-            {/* Terms agreement */}
-            <label className="flex items-start gap-2.5 text-sm cursor-pointer" style={{ color: 'var(--foreground-muted)' }}>
-              <input
-                type="checkbox"
-                checked={agreed}
-                onChange={e => setAgreed(e.target.checked)}
-                required
-                className="mt-0.5 shrink-0"
-                style={{ accentColor: 'var(--primary)' }}
-              />
-              <span>
-                I agree to the{' '}
-                <Link href="/terms" target="_blank" className="font-semibold hover:underline" style={{ color: 'var(--primary)' }}>Terms of Service</Link>
-                {' '}and{' '}
-                <Link href="/privacy" target="_blank" className="font-semibold hover:underline" style={{ color: 'var(--primary)' }}>Privacy Policy</Link>.
-              </span>
-            </label>
-
-            {/* CAPTCHA — account creation only (login is protected by rate limiting) */}
-            {captchaRequired && TURNSTILE_SITE_KEY && (
-              <Turnstile siteKey={TURNSTILE_SITE_KEY} onToken={setCaptchaToken} />
             )}
 
-            <button
-              type="submit"
-              disabled={!canSubmit}
-              className="w-full rounded-lg py-2.5 text-sm font-semibold transition-all duration-150 mt-1"
-              style={{
-                backgroundColor: canSubmit ? 'var(--primary)' : 'var(--primary-hover)',
-                color: '#fff',
-                opacity: canSubmit ? 1 : 0.6,
-                cursor: canSubmit ? 'pointer' : 'not-allowed',
-              }}
-            >
-              {loading ? 'Creating account…' : 'Create Account →'}
-            </button>
-          </form>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+              {/* Username */}
+              <div>
+                <label className="block mb-1" style={{ fontFamily: 'var(--ms-font-d)', fontSize: 11, letterSpacing: 1, color: '#2a1810' }}>
+                  USERNAME <span className="opacity-70">({form.name.length}/13)</span>
+                </label>
+                <input
+                  type="text"
+                  value={form.name}
+                  onChange={e => update('name', e.target.value.replace(/\s/g, ''))}
+                  onBlur={() => blur('name')}
+                  placeholder="MapleHero42"
+                  maxLength={13}
+                  autoFocus
+                  required
+                  className="w-full min-h-[44px] px-3 py-2"
+                  style={{
+                    fontFamily: 'var(--ms-font-b)',
+                    fontSize: 20,
+                    background: '#fff8d8',
+                    border: '2px solid #2a1810',
+                    color: '#2a1810',
+                    boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.1)',
+                    outline: 'none',
+                  }}
+                />
+                {touched.name && nameErr && (
+                  <div className="mt-1" style={{ fontFamily: 'var(--ms-font-b)', fontSize: 18, color: '#c64b1b' }}>
+                    ⚠ {nameErr}
+                  </div>
+                )}
+              </div>
 
-          <p className="text-sm text-center mt-6" style={{ color: 'var(--foreground-subtle)' }}>
-            Already have an account?{' '}
-            <Link href="/login" className="font-semibold" style={{ color: 'var(--primary)' }}>
-              Sign in
-            </Link>
-          </p>
+              {/* Password + Confirm */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block mb-1" style={{ fontFamily: 'var(--ms-font-d)', fontSize: 11, letterSpacing: 1, color: '#2a1810' }}>
+                    PASSWORD
+                  </label>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={form.password}
+                    onChange={e => update('password', e.target.value)}
+                    onBlur={() => blur('password')}
+                    placeholder="••••••••"
+                    minLength={6}
+                    required
+                    className="w-full min-h-[44px] px-3 py-2"
+                    style={{
+                      fontFamily: 'var(--ms-font-b)',
+                      fontSize: 20,
+                      background: '#fff8d8',
+                      border: '2px solid #2a1810',
+                      color: '#2a1810',
+                      boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.1)',
+                      outline: 'none',
+                    }}
+                  />
+                  {touched.password && pwdErr && (
+                    <div className="mt-1" style={{ fontFamily: 'var(--ms-font-b)', fontSize: 18, color: '#c64b1b' }}>
+                      ⚠ {pwdErr}
+                    </div>
+                  )}
+                  {form.password && (
+                    <div className="mt-2">
+                      <div style={{ display: 'flex', gap: 2, height: 8, border: '2px solid #1a0a04', background: '#1a0a04' }}>
+                        {[1,2,3,4,5].map(i => (
+                          <div
+                            key={i}
+                            className="flex-1"
+                            style={{
+                              background: i <= pwdScore ? STRENGTH_COLOR[pwdScore] : '#3a2418',
+                            }}
+                          />
+                        ))}
+                      </div>
+                      <div className="mt-1" style={{ fontFamily: 'var(--ms-font-d)', fontSize: 9, color: STRENGTH_COLOR[pwdScore] }}>
+                        {STRENGTH_LABEL[pwdScore]}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block mb-1" style={{ fontFamily: 'var(--ms-font-d)', fontSize: 11, letterSpacing: 1, color: '#2a1810' }}>
+                    CONFIRM{' '}
+                    <span
+                      className="cursor-pointer underline decoration-dotted"
+                      style={{ color: '#c64b1b' }}
+                      onClick={() => setShowPassword(s => !s)}
+                    >
+                      {showPassword ? '🙈 hide' : '👁 show'}
+                    </span>
+                  </label>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={form.confirm}
+                    onChange={e => update('confirm', e.target.value)}
+                    onBlur={() => blur('confirm')}
+                    placeholder="repeat password"
+                    required
+                    className="w-full min-h-[44px] px-3 py-2"
+                    style={{
+                      fontFamily: 'var(--ms-font-b)',
+                      fontSize: 20,
+                      background: '#fff8d8',
+                      border: '2px solid #2a1810',
+                      color: '#2a1810',
+                      boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.1)',
+                      outline: 'none',
+                    }}
+                  />
+                  {touched.confirm && confirmErr && (
+                    <div className="mt-1" style={{ fontFamily: 'var(--ms-font-b)', fontSize: 18, color: '#c64b1b' }}>
+                      ⚠ {confirmErr}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block mb-1" style={{ fontFamily: 'var(--ms-font-d)', fontSize: 11, letterSpacing: 1, color: '#2a1810' }}>
+                  EMAIL <span className="opacity-70">for password resets</span>
+                </label>
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={e => update('email', e.target.value)}
+                  onBlur={() => blur('email')}
+                  placeholder="adventurer@maplemail.com"
+                  required
+                  className="w-full min-h-[44px] px-3 py-2"
+                  style={{
+                    fontFamily: 'var(--ms-font-b)',
+                    fontSize: 20,
+                    background: '#fff8d8',
+                    border: '2px solid #2a1810',
+                    color: '#2a1810',
+                    boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.1)',
+                    outline: 'none',
+                  }}
+                />
+                {touched.email && emailErr && (
+                  <div className="mt-1" style={{ fontFamily: 'var(--ms-font-b)', fontSize: 18, color: '#c64b1b' }}>
+                    ⚠ {emailErr}
+                  </div>
+                )}
+              </div>
+
+              {/* Birthday */}
+              <div>
+                <label className="block mb-1" style={{ fontFamily: 'var(--ms-font-d)', fontSize: 11, letterSpacing: 1, color: '#2a1810' }}>
+                  BIRTHDAY
+                </label>
+                <input
+                  type="date"
+                  value={form.birthday}
+                  onChange={e => update('birthday', e.target.value)}
+                  onBlur={() => blur('birthday')}
+                  required
+                  className="w-full min-h-[44px] px-3 py-2"
+                  style={{
+                    fontFamily: 'var(--ms-font-b)',
+                    fontSize: 20,
+                    background: '#fff8d8',
+                    border: '2px solid #2a1810',
+                    color: '#2a1810',
+                    boxShadow: 'inset 2px 2px 0 rgba(0,0,0,0.1)',
+                    outline: 'none',
+                  }}
+                />
+              </div>
+
+              {/* Terms */}
+              <label className="flex items-start gap-2 cursor-pointer" style={{ fontFamily: 'var(--ms-font-b)', fontSize: 20, color: '#2a1810' }}>
+                <input
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={e => setAgreed(e.target.checked)}
+                  required
+                  className="mt-1 shrink-0 min-w-[18px] min-h-[18px]"
+                  style={{ accentColor: '#c64b1b' }}
+                />
+                <span>
+                  I agree to the{' '}
+                  <Link href="/terms" target="_blank" className="font-semibold hover:underline" style={{ color: '#c64b1b' }}>
+                    Terms of Service
+                  </Link>{' '}
+                  and{' '}
+                  <Link href="/privacy" target="_blank" className="font-semibold hover:underline" style={{ color: '#c64b1b' }}>
+                    Privacy Policy
+                  </Link>
+                  .
+                </span>
+              </label>
+
+              {/* Captcha */}
+              {captchaRequired && TURNSTILE_SITE_KEY && (
+                <Turnstile siteKey={TURNSTILE_SITE_KEY} onToken={setCaptchaToken} />
+              )}
+
+              <button
+                type="submit"
+                disabled={!canSubmit}
+                className="ms-btn ms-btn-green w-full justify-center mt-1"
+                style={{ opacity: canSubmit ? 1 : 0.6, cursor: canSubmit ? 'pointer' : 'not-allowed' }}
+              >
+                {loading ? '⏳ CREATING…' : '+ CREATE ACCOUNT'}
+              </button>
+
+              <div className="text-center mt-2" style={{ fontFamily: 'var(--ms-font-b)', fontSize: 20, color: '#4a3220' }}>
+                Already have one?{' '}
+                <Link href="/login" className="font-bold hover:underline" style={{ color: '#c64b1b', textDecoration: 'underline dotted' }}>
+                  Sign in →
+                </Link>
+              </div>
+            </form>
+          </NpcBox>
         </div>
+      </div>
     </AuthBackdrop>
   )
 }

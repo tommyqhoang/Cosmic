@@ -8,7 +8,7 @@ import { sendAnnouncementEmails, sendDiscordAnnouncement } from '../../lib/email
 
 jest.mock('next-auth', () => ({ getServerSession: jest.fn() }))
 jest.mock('../../lib/auth', () => ({ authOptions: {} }))
-jest.mock('next/cache', () => ({ revalidatePath: jest.fn() }))
+jest.mock('next/cache', () => ({ revalidatePath: jest.fn(), unstable_cache: jest.fn((fn) => fn) }))
 jest.mock('../../lib/prisma', () => ({
   prisma: {
     cmsPost: { findMany: jest.fn(), create: jest.fn() },
@@ -18,6 +18,9 @@ jest.mock('../../lib/prisma', () => ({
 jest.mock('../../lib/email', () => ({
   sendAnnouncementEmails: jest.fn(async () => 0),
   sendDiscordAnnouncement: jest.fn(async () => undefined),
+}))
+jest.mock('../../lib/settings', () => ({
+  readSocialLinks: jest.fn(async () => ({ discord: 'https://discord.gg/test' })),
 }))
 
 const session = getServerSession as jest.Mock
@@ -94,7 +97,7 @@ describe('POST /api/posts', () => {
 
   it('broadcasts to email + Discord by default', async () => {
     await POST(req(validPost))
-    expect(emails).toHaveBeenCalledWith(expect.objectContaining({ title: 'Hi' }), [{ email: 'a@b.com', token: 'tok' }])
+    expect(emails).toHaveBeenCalledWith(expect.objectContaining({ title: 'Hi' }), [{ email: 'a@b.com', token: 'tok' }], 'https://discord.gg/test')
     expect(discord).toHaveBeenCalledWith(expect.objectContaining({ title: 'Hi' }))
   })
 

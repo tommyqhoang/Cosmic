@@ -22,21 +22,27 @@ const MAX_MATCHES = 6
 
 function rateColor(chance: number): { bg: string; fg: string } {
   const pct = (chance / 1_000_000) * 100
-  if (pct >= 10) return { bg: 'var(--success-subtle)', fg: 'var(--success)' }
-  if (pct >= 1) return { bg: 'var(--primary-subtle)', fg: 'var(--primary)' }
-  return { bg: 'var(--accent-subtle)', fg: 'var(--accent-foreground)' }
+  if (pct >= 10) return { bg: '#e8f5ef', fg: '#1d6b41' }
+  if (pct >= 1) return { bg: '#e8f0f8', fg: '#3b6ea5' }
+  return { bg: '#fef8e7', fg: '#6b4e10' }
 }
 
 function qtyLabel(min: number, max: number): string {
   return min === max ? `${min}` : `${min}–${max}`
 }
 
-/** Pixel-art icon tile (item or monster) on the signature beige surface. */
+/** Pixel-art icon tile with pixel border. */
 function IconTile({ src, alt, size = 56 }: { src: string; alt: string; size?: number }) {
   return (
     <span
-      className="inline-flex items-center justify-center rounded-xl shrink-0"
-      style={{ width: size, height: size, backgroundColor: 'var(--surface-subtle)', border: '1px solid var(--border-subtle)' }}
+      className="inline-flex items-center justify-center shrink-0 sprite"
+      style={{
+        width: size,
+        height: size,
+        backgroundColor: '#f8efd0',
+        border: '2px solid #3a2418',
+        boxShadow: 'inset 1px 1px 0 #fff5d8, inset -1px -1px 0 #b89460',
+      }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt={alt} loading="lazy" draggable={false}
@@ -48,24 +54,44 @@ function IconTile({ src, alt, size = 56 }: { src: string; alt: string; size?: nu
 function RatePill({ chance }: { chance: number }) {
   const { bg, fg } = rateColor(chance)
   return (
-    <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-full" style={{ backgroundColor: bg, color: fg }}>
+    <span
+      className="inline-block"
+      style={{
+        fontFamily: 'var(--ms-font-d)',
+        fontSize: '9px',
+        letterSpacing: '1px',
+        backgroundColor: bg,
+        color: fg,
+        border: '2px solid #3a2418',
+        padding: '4px 8px',
+        boxShadow: '2px 2px 0 rgba(0,0,0,0.3)',
+      }}
+    >
       {dropRatePct(chance)}
     </span>
   )
 }
 
-/** One row inside a drop list: an icon, a name, then rate + quantity. */
+/** One row inside a drop list. */
 function DropRow({
   iconSrc, name, chance, min, max, questid,
 }: {
   iconSrc: string; name: string; chance: number; min: number; max: number; questid: number
 }) {
   return (
-    <li className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors hover:bg-[var(--surface-subtle)]">
+    <li
+      className="flex items-center gap-3 px-3 py-2.5 transition-colors hover:bg-[var(--ms-slot-hover)]"
+      style={{ backgroundColor: 'var(--ms-panel-bg)' }}
+    >
       <IconTile src={iconSrc} alt={name} size={44} />
       <div className="min-w-0 flex-1">
-        <div className="text-sm font-semibold truncate" style={{ color: 'var(--foreground)' }}>{name}</div>
-        <div className="text-xs" style={{ color: 'var(--foreground-subtle)' }}>
+        <div
+          className="truncate"
+          style={{ fontFamily: 'var(--ms-font-b)', fontSize: '18px', color: '#2a1810' }}
+        >
+          {name}
+        </div>
+        <div style={{ fontFamily: 'var(--ms-font-b)', fontSize: '16px', color: '#4a3220' }}>
           Qty {qtyLabel(min, max)}{questid > 0 ? ' · quest item' : ''}
         </div>
       </div>
@@ -91,17 +117,31 @@ async function ItemResults({ itemId }: { itemId: number }) {
 
   const empty = drops.length === 0 && globals.length === 0
   return (
-    <section className="rounded-2xl overflow-hidden" style={{ border: '1px solid var(--border)', boxShadow: '0 1px 8px rgba(28,21,39,0.06)' }}>
-      <header className="flex items-center gap-4 p-4" style={{ background: 'linear-gradient(180deg, var(--surface-raised), var(--surface))', borderBottom: '1px solid var(--border-subtle)' }}>
+    <section className="ms-pixel-panel overflow-hidden">
+      <header
+        className="flex items-center gap-4 px-4 py-3"
+        style={{
+          background: 'linear-gradient(to bottom, #6a4830 0%, #4a3220 50%, #3a2418 100%)',
+          borderBottom: '3px solid #2a1810',
+        }}
+      >
         <IconTile src={itemIcon(itemId)} alt={itemName} />
         <div>
-          <h2 className="font-display font-bold text-lg leading-tight" style={{ color: 'var(--foreground)' }}>{itemName}</h2>
-          <p className="text-xs font-mono mt-0.5" style={{ color: 'var(--foreground-subtle)' }}>Item #{itemId} · {drops.length} source{drops.length === 1 ? '' : 's'}</p>
+          <h2
+            style={{ fontFamily: 'var(--ms-font-d)', fontSize: '12px', color: '#ffd96b', letterSpacing: '1px', textShadow: '2px 2px 0 #1a0a04' }}
+          >
+            {itemName}
+          </h2>
+          <p style={{ fontFamily: 'var(--ms-font-d)', fontSize: '9px', color: '#b89460', marginTop: '4px' }}>
+            Item #{itemId} · {drops.length} source{drops.length === 1 ? '' : 's'}
+          </p>
         </div>
       </header>
-      <div className="p-3" style={{ backgroundColor: 'var(--surface)' }}>
+      <div className="p-2" style={{ backgroundColor: 'var(--ms-panel-bg)' }}>
         {empty ? (
-          <p className="text-sm text-center py-8" style={{ color: 'var(--foreground-subtle)' }}>No monster drops this item. It may come from a shop, quest, or reactor.</p>
+          <p className="text-center py-8" style={{ fontFamily: 'var(--ms-font-b)', fontSize: '20px', color: '#4a3220' }}>
+            No monster drops this item. It may come from a shop, quest, or reactor.
+          </p>
         ) : (
           <ul className="flex flex-col gap-0.5">
             {globals.map((g: GlobalDrop, i) => (
@@ -125,19 +165,33 @@ async function MobResults({ mobId }: { mobId: number }) {
   const mobName = mobNames.get(mobId) ?? `Monster #${mobId}`
 
   return (
-    <section className="rounded-2xl overflow-hidden" style={{ border: '1px solid var(--border)', boxShadow: '0 1px 8px rgba(28,21,39,0.06)' }}>
-      <header className="flex items-center gap-4 p-4" style={{ background: 'linear-gradient(180deg, var(--surface-raised), var(--surface))', borderBottom: '1px solid var(--border-subtle)' }}>
+    <section className="ms-pixel-panel overflow-hidden">
+      <header
+        className="flex items-center gap-4 px-4 py-3"
+        style={{
+          background: 'linear-gradient(to bottom, #6a4830 0%, #4a3220 50%, #3a2418 100%)',
+          borderBottom: '3px solid #2a1810',
+        }}
+      >
         <IconTile src={mobRender(mobId)} alt={mobName} />
         <div>
-          <h2 className="font-display font-bold text-lg leading-tight" style={{ color: 'var(--foreground)' }}>{mobName}</h2>
-          <p className="text-xs font-mono mt-0.5" style={{ color: 'var(--foreground-subtle)' }}>Monster #{mobId} · {drops.length} drop{drops.length === 1 ? '' : 's'}</p>
+          <h2
+            style={{ fontFamily: 'var(--ms-font-d)', fontSize: '12px', color: '#ffd96b', letterSpacing: '1px', textShadow: '2px 2px 0 #1a0a04' }}
+          >
+            {mobName}
+          </h2>
+          <p style={{ fontFamily: 'var(--ms-font-d)', fontSize: '9px', color: '#b89460', marginTop: '4px' }}>
+            Monster #{mobId} · {drops.length} drop{drops.length === 1 ? '' : 's'}
+          </p>
         </div>
       </header>
-      <div className="p-3" style={{ backgroundColor: 'var(--surface)' }}>
+      <div className="p-2" style={{ backgroundColor: 'var(--ms-panel-bg)' }}>
         {drops.length === 0 ? (
-          <p className="text-sm text-center py-8" style={{ color: 'var(--foreground-subtle)' }}>No drops recorded for this monster.</p>
+          <p className="text-center py-8" style={{ fontFamily: 'var(--ms-font-b)', fontSize: '20px', color: '#4a3220' }}>
+            No drops recorded for this monster.
+          </p>
         ) : (
-          <ul className="grid sm:grid-cols-2 gap-0.5">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-0.5">
             {drops.map((d: MobDrop) => (
               <DropRow key={d.itemid} iconSrc={itemIcon(d.itemid)} name={itemNames.get(d.itemid) ?? `Item #${d.itemid}`} chance={d.chance} min={d.minimum_quantity} max={d.maximum_quantity} questid={d.questid} />
             ))}
@@ -152,10 +206,8 @@ function ModeTab({ label, mode, active, q }: { label: string; mode: string; acti
   const href = `/drops?mode=${mode}${q ? `&q=${encodeURIComponent(q)}` : ''}`
   return (
     <a href={href} aria-current={active ? 'true' : undefined}
-      className="text-xs font-semibold px-3.5 py-1.5 rounded-full transition-colors duration-150"
-      style={active
-        ? { backgroundColor: 'var(--primary)', color: '#fff', border: '1px solid var(--primary)' }
-        : { backgroundColor: 'var(--surface)', color: 'var(--foreground-muted)', border: '1px solid var(--border)' }}>
+      className={active ? 'ms-btn ms-btn-green' : 'ms-btn'}
+    >
       {label}
     </a>
   )
@@ -178,42 +230,56 @@ export default async function DropsPage({
       <div className="mb-6 flex items-center gap-3">
         <Sprite src="/maple/mobs/blue-mushroom.gif" alt="" height={52} anim="hop" grounded={false} className="hidden sm:block shrink-0" />
         <div>
-          <h1 className="font-display font-bold text-2xl sm:text-3xl" style={{ color: 'var(--foreground)', letterSpacing: '0.02em' }}>Drop Search</h1>
-          <p className="text-sm mt-1" style={{ color: 'var(--foreground-subtle)' }}>
+          <h1 className="ms-section-title" style={{ margin: 0 }}>
+            Drop Search
+          </h1>
+          <p className="mt-1" style={{ fontFamily: 'var(--ms-font-b)', fontSize: '18px', color: '#4a3220' }}>
             Find which monster drops an item — or pull up a monster&apos;s full loot table.
           </p>
         </div>
       </div>
 
       {/* Mode + search */}
-      <div className="flex gap-2 mb-3">
+      <div className="flex flex-wrap gap-2 mb-3">
         <ModeTab label="Find an item" mode="item" active={mode === 'item'} q={query} />
         <ModeTab label="Monster drop table" mode="mob" active={mode === 'mob'} q={query} />
       </div>
 
-      <form method="GET" action="/drops" className="flex gap-3 mb-8">
+      <form method="GET" action="/drops" className="flex flex-col sm:flex-row gap-3 mb-8">
         <input type="hidden" name="mode" value={mode} />
         <input name="q" defaultValue={query} autoComplete="off"
           placeholder={mode === 'item' ? 'Item name or ID — e.g. Maple Sword, 1302063' : 'Monster name or ID — e.g. Orange Mushroom, 100100'}
-          className="flex-1 rounded-xl px-4 py-2.5 text-sm"
-          style={{ border: '1px solid var(--border)', backgroundColor: 'var(--surface)', color: 'var(--foreground)', outline: 'none' }} />
-        <button type="submit" className="px-5 py-2.5 rounded-xl text-sm font-semibold" style={{ backgroundColor: 'var(--primary)', color: '#fff' }}>Search</button>
+          className="flex-1 px-4 py-2.5"
+          style={{
+            border: '3px solid #3a2418',
+            backgroundColor: '#f8efd0',
+            color: '#2a1810',
+            fontFamily: 'var(--ms-font-b)',
+            fontSize: '18px',
+            outline: 'none',
+            boxShadow: 'inset 2px 2px 0 #b89460, inset -2px -2px 0 #fff5d8',
+          }} />
+        <button type="submit" className="ms-btn">Search</button>
         {query && (
-          <a href={`/drops?mode=${mode}`} className="px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center" style={{ backgroundColor: 'var(--surface-subtle)', color: 'var(--foreground-muted)', border: '1px solid var(--border)' }}>Clear</a>
+          <a href={`/drops?mode=${mode}`} className="ms-btn" style={{ background: 'linear-gradient(to bottom, #d8c08c 0%, #b89460 100%)', color: '#2a1810', textShadow: '1px 1px 0 #f0dc9c' }}>
+            Clear
+          </a>
         )}
       </form>
 
       {/* Results */}
       {!query ? (
-        <div className="rounded-2xl text-center py-16 px-6" style={{ border: '1px dashed var(--border-strong)', backgroundColor: 'var(--surface-subtle)' }}>
-          <p className="font-display text-lg mb-1" style={{ color: 'var(--foreground)' }}>Search the drop tables</p>
-          <p className="text-sm" style={{ color: 'var(--foreground-subtle)' }}>
-            Rates shown are the <strong>base</strong> chance per kill — your in-game odds scale with the server&apos;s 3× drop rate.
+        <div className="ms-pixel-panel text-center py-16 px-6">
+          <p style={{ fontFamily: 'var(--ms-font-d)', fontSize: '12px', color: '#2a1810', marginBottom: '8px' }}>
+            Search the drop tables
+          </p>
+          <p style={{ fontFamily: 'var(--ms-font-b)', fontSize: '18px', color: '#4a3220' }}>
+            Rates shown are the <strong style={{ color: '#2a1810' }}>base</strong> chance per kill — your in-game odds scale with the server&apos;s 3× drop rate.
           </p>
         </div>
       ) : ids.length === 0 ? (
-        <div className="rounded-2xl text-center py-16 px-6" style={{ border: '1px solid var(--border)', backgroundColor: 'var(--surface)' }}>
-          <p className="text-sm" style={{ color: 'var(--foreground-subtle)' }}>
+        <div className="ms-pixel-panel text-center py-16 px-6">
+          <p style={{ fontFamily: 'var(--ms-font-b)', fontSize: '18px', color: '#4a3220' }}>
             No {mode === 'item' ? 'items' : 'monsters'} match &quot;{query}&quot;. Try a different spelling or a numeric ID.
           </p>
         </div>

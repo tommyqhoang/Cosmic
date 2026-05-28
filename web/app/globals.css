@@ -393,3 +393,477 @@ html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   .sprite-bob, .sprite-hop, .sprite-sway, .cloud, .leaf { animation: none; }
 }
+
+/* ════════════════════════════════════════════════════════════════
+   MAPLE COSPLAY DESIGN SYSTEM
+   Full pixel-art MapleStory v83 UI — NPC boxes, inventory slots,
+   HP/MP/EXP bars, pixel borders and classic game chrome.
+   ════════════════════════════════════════════════════════════════ */
+
+:root {
+  --ms-npc-bg: #fdf5dc;
+  --ms-npc-border-out: #1a1a1a;
+  --ms-npc-border-in: #f6e8b4;
+  --ms-panel-bg: #f3e4be;
+  --ms-panel-border: #2a1810;
+  --ms-panel-shadow: #b89460;
+  --ms-slot-bg: #d8c08c;
+  --ms-slot-shadow: #8a6f3c;
+  --ms-slot-hover: #f0dc9c;
+  --ms-gold: #f8c34a;
+  --ms-text: #2a1810;
+  --ms-font-d: var(--font-press-start-2p), 'Pixelify Sans', monospace;
+  --ms-font-b: var(--font-vt323), 'Pixelify Sans', monospace;
+}
+
+/* ── Pixel panel ── */
+.ms-pixel-panel {
+  background: var(--ms-panel-bg);
+  border: 3px solid var(--ms-panel-border);
+  box-shadow:
+    inset -3px -3px 0 0 var(--ms-panel-shadow),
+    inset 3px 3px 0 0 #fff5d8,
+    4px 4px 0 0 rgba(0,0,0,0.4);
+}
+
+/* ── NPC dialogue box ── */
+.ms-npc-box {
+  background: var(--ms-npc-bg);
+  border: 3px solid var(--ms-npc-border-out);
+  box-shadow:
+    inset 0 0 0 3px var(--ms-npc-border-in),
+    inset 0 0 0 4px var(--ms-npc-border-out),
+    6px 6px 0 0 rgba(0,0,0,0.4);
+}
+.ms-npc-title {
+  background: linear-gradient(to bottom, #6a4830 0%, #4a3220 50%, #3a2418 100%);
+  color: #ffd96b;
+  font-family: var(--ms-font-d);
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 10px 16px;
+  text-shadow: 2px 2px 0 #1a0a04;
+  border-bottom: 3px solid var(--ms-npc-border-out);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ms-npc-body {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  align-items: flex-start;
+}
+.ms-npc-text {
+  flex: 1;
+  font-family: var(--ms-font-b);
+  font-size: 21px;
+  line-height: 1.3;
+  color: var(--ms-text);
+}
+.ms-npc-name {
+  display: block;
+  font-family: var(--ms-font-d);
+  font-size: 9px;
+  color: #c64b1b;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+.ms-npc-actions {
+  background: #f0dfb0;
+  border-top: 2px dashed var(--ms-slot-shadow);
+  padding: 10px 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ── Maple buttons ── */
+.ms-btn {
+  font-family: var(--ms-font-d);
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 12px 18px;
+  background: linear-gradient(to bottom, #ffe086 0%, #f8c34a 45%, #e2a020 100%);
+  border: 3px solid #2a1810;
+  color: #2a1810;
+  cursor: pointer;
+  text-shadow: 1px 1px 0 #fff5b0;
+  box-shadow: inset 2px 2px 0 #fff5b0, inset -2px -2px 0 #a06800, 3px 3px 0 #2a1810;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.06s;
+  line-height: 1;
+}
+.ms-btn:hover { background: linear-gradient(to bottom, #fff0a8 0%, #ffd060 45%, #f0b020 100%); }
+.ms-btn:active { transform: translate(2px, 2px); }
+.ms-btn-green {
+  background: linear-gradient(to bottom, #88dc6a 0%, #4caf30 50%, #2e7a18 100%);
+  color: #fff8d8;
+  text-shadow: 1px 1px 0 #1a4a08;
+  box-shadow: inset 2px 2px 0 #b4f098, inset -2px -2px 0 #1e5208, 3px 3px 0 #2a1810;
+}
+.ms-btn-sm { font-size: 9px; padding: 8px 12px; }
+
+/* ── HP / MP / EXP stat bars ── */
+.ms-stat-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--ms-font-d);
+  font-size: 9px;
+}
+.ms-stat-label {
+  width: 40px;
+  flex-shrink: 0;
+  text-align: center;
+  padding: 4px 0;
+  color: #fff;
+  text-shadow: 1px 1px 0 #000;
+  border: 2px solid #1a0a04;
+}
+.ms-stat-track {
+  flex: 1;
+  height: 18px;
+  background: #2a1810;
+  border: 2px solid #1a0a04;
+  position: relative;
+  overflow: hidden;
+}
+.ms-stat-fill {
+  height: 100%;
+  position: relative;
+}
+.ms-stat-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(-45deg, transparent 0 6px, rgba(255,255,255,0.15) 6px 8px);
+}
+.ms-stat-value {
+  font-family: var(--ms-font-d);
+  font-size: 9px;
+  color: var(--ms-text);
+  min-width: 72px;
+  text-align: right;
+}
+.ms-stat-hp .ms-stat-label { background: #c03030; }
+.ms-stat-hp .ms-stat-fill  { background: linear-gradient(to right, #e83030 0%, #f87070 100%); }
+.ms-stat-mp .ms-stat-label { background: #2060c0; }
+.ms-stat-mp .ms-stat-fill  { background: linear-gradient(to right, #2060c0 0%, #5090e0 100%); }
+.ms-stat-exp .ms-stat-label { background: #5a30a8; }
+.ms-stat-exp .ms-stat-fill  { background: linear-gradient(to right, #7c44d4 0%, #b880f0 100%); }
+
+/* ── Inventory slots ── */
+.ms-inv-slot {
+  aspect-ratio: 1;
+  background: var(--ms-slot-bg);
+  border: 2px solid var(--ms-slot-shadow);
+  box-shadow: inset 1px 1px 0 #fff5d8, inset -2px -2px 0 #6a4f1a;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.ms-inv-slot:hover { background: var(--ms-slot-hover); }
+.ms-inv-slot:hover .ms-tooltip { opacity: 1; transform: translateY(0); }
+.ms-inv-slot-empty { cursor: default; }
+.ms-inv-count {
+  position: absolute;
+  bottom: 2px; right: 3px;
+  font-family: var(--ms-font-d);
+  font-size: 8px;
+  color: #fff;
+  text-shadow: 1px 1px 0 #000;
+  pointer-events: none;
+}
+
+.ms-tooltip {
+  position: absolute;
+  z-index: 100;
+  background: rgba(20,12,6,0.95);
+  border: 2px solid #f8c34a;
+  color: #fff8d8;
+  padding: 10px 12px;
+  font-family: var(--ms-font-b);
+  font-size: 18px;
+  line-height: 1.2;
+  min-width: 180px;
+  pointer-events: none;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.12s, transform 0.12s;
+  left: calc(100% + 6px);
+  top: 0;
+  white-space: nowrap;
+}
+.ms-tooltip-name {
+  color: #f8c34a;
+  font-family: var(--ms-font-d);
+  font-size: 10px;
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+  display: block;
+}
+.ms-tooltip-rarity { color: #ff9a48; font-size: 14px; margin-bottom: 4px; display: block; }
+.ms-tooltip-desc { color: #d8d4c0; font-size: 16px; display: block; }
+
+/* ── Section banner ── */
+.ms-section-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(to bottom, #6a4830 0%, #4a3220 100%);
+  color: var(--ms-gold);
+  font-family: var(--ms-font-d);
+  font-size: 12px;
+  padding: 10px 22px;
+  letter-spacing: 2px;
+  border: 3px solid #1a0a04;
+  box-shadow: inset 2px 2px 0 #8a6240, inset -2px -2px 0 #2a1408, 3px 3px 0 rgba(0,0,0,0.4);
+  text-shadow: 1px 1px 0 #1a0a04;
+  margin-bottom: 16px;
+}
+.ms-section-banner::before { content: '★'; }
+
+/* ── Section title + muted body ── */
+.ms-section-title {
+  font-family: var(--ms-font-d);
+  font-size: clamp(14px, 2vw, 22px);
+  color: var(--ms-text);
+  margin: 8px 0 16px;
+  letter-spacing: 1px;
+  line-height: 1.4;
+  text-shadow: 2px 2px 0 rgba(255,255,255,0.5);
+}
+.ms-muted { font-family: var(--ms-font-b); font-size: 22px; color: #4a3220; }
+
+/* ── Screenshot frame ── */
+.ms-screenshot-frame {
+  border: 4px solid #1a0a04;
+  box-shadow: inset 0 0 0 3px #f8c34a, inset 0 0 0 6px #1a0a04, 8px 8px 0 rgba(0,0,0,0.4);
+  background: #000;
+  overflow: hidden;
+  position: relative;
+}
+.ms-screenshot-badge {
+  position: absolute;
+  top: 12px; left: 12px;
+  background: rgba(20,12,6,0.85);
+  border: 2px solid #f8c34a;
+  padding: 4px 10px;
+  font-family: var(--ms-font-d);
+  font-size: 9px;
+  color: #fff8d8;
+  letter-spacing: 1px;
+  z-index: 2;
+}
+
+/* ── Quest card ── */
+.ms-quest-card {
+  background: var(--ms-npc-bg);
+  border: 3px solid var(--ms-npc-border-out);
+  box-shadow: inset 0 0 0 3px var(--ms-npc-border-in), 4px 4px 0 rgba(0,0,0,0.4);
+}
+.ms-quest-head {
+  background: linear-gradient(to bottom, #f8c34a 0%, #e2a020 100%);
+  border-bottom: 3px solid #1a0a04;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--ms-font-d);
+  font-size: 11px;
+  color: #2a1810;
+  text-shadow: 1px 1px 0 #fff5b0;
+}
+.ms-quest-pinned {
+  background: #c64b1b; color: #fff;
+  font-size: 8px; padding: 3px 6px;
+  border: 1px solid #1a0a04; letter-spacing: 1px;
+}
+.ms-quest-body {
+  padding: 16px 18px 18px;
+  font-family: var(--ms-font-b);
+  font-size: 20px; line-height: 1.3; color: #2a1810;
+}
+.ms-quest-title {
+  font-family: var(--ms-font-d);
+  font-size: 13px; color: #c64b1b;
+  margin: 0 0 10px; letter-spacing: 1px; line-height: 1.4;
+}
+
+/* ── Step card ── */
+.ms-step-card {
+  background: var(--ms-npc-bg);
+  border: 3px solid var(--ms-npc-border-out);
+  box-shadow: inset 0 0 0 3px var(--ms-npc-border-in), 4px 4px 0 rgba(0,0,0,0.4);
+  padding: 24px 20px 20px;
+  position: relative;
+}
+.ms-step-num {
+  position: absolute; top: -14px; left: -14px;
+  width: 44px; height: 44px;
+  background: linear-gradient(to bottom, #88dc6a 0%, #4caf30 50%, #2e7a18 100%);
+  color: #fff;
+  border: 3px solid #1a0a04;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--ms-font-d); font-size: 16px;
+  text-shadow: 1px 1px 0 #1a4a08;
+  box-shadow: 3px 3px 0 rgba(0,0,0,0.4);
+}
+.ms-step-title {
+  font-family: var(--ms-font-d); font-size: 11px;
+  color: #c64b1b; margin: 4px 0 10px 28px;
+  letter-spacing: 1px; line-height: 1.4;
+}
+.ms-step-body { font-family: var(--ms-font-b); font-size: 21px; line-height: 1.25; color: var(--ms-text); }
+
+/* ── Testimony card ── */
+.ms-testimony {
+  background: var(--ms-npc-bg);
+  border: 3px solid var(--ms-npc-border-out);
+  box-shadow: inset 0 0 0 3px var(--ms-npc-border-in), 4px 4px 0 rgba(0,0,0,0.4);
+  position: relative; display: flex; flex-direction: column;
+}
+.ms-testimony-tag {
+  position: absolute; top: -14px; left: 12px;
+  background: var(--ms-gold); border: 2px solid #1a0a04;
+  padding: 4px 8px; font-family: var(--ms-font-d);
+  font-size: 8px; letter-spacing: 1px;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+}
+.ms-testimony-body { padding: 24px 18px 14px; font-family: var(--ms-font-b); font-size: 22px; line-height: 1.25; color: var(--ms-text); flex: 1; }
+.ms-testimony-who { display: flex; align-items: center; gap: 10px; padding: 10px 18px; border-top: 2px dashed var(--ms-slot-shadow); background: #f0dfb0; }
+.ms-testimony-name { font-family: var(--ms-font-d); font-size: 10px; color: #c64b1b; }
+.ms-testimony-meta { font-family: var(--ms-font-b); font-size: 16px; color: #4a3220; }
+
+/* ── Boss card ── */
+.ms-boss-card {
+  background: rgba(40,24,12,0.85);
+  border: 3px solid var(--ms-gold);
+  box-shadow: inset 0 0 0 3px #1a0a04, 4px 4px 0 rgba(0,0,0,0.6);
+  padding: 20px; text-align: center; position: relative;
+}
+.ms-boss-label {
+  position: absolute; top: -12px; left: 12px;
+  background: #c64b1b; color: #fff;
+  border: 2px solid #1a0a04;
+  padding: 3px 8px; font-family: var(--ms-font-d); font-size: 8px;
+  letter-spacing: 1px; box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+}
+
+/* ── Hero type elements ── */
+.ms-hero-title {
+  font-family: var(--ms-font-d);
+  font-size: clamp(22px, 4vw, 44px);
+  color: #f8c34a;
+  text-shadow:
+    3px 3px 0 #2a1810, -1px -1px 0 #2a1810, 1px -1px 0 #2a1810,
+    -1px 1px 0 #2a1810, 0 -2px 0 #2a1810, 0 2px 0 #2a1810,
+    6px 6px 0 rgba(0,0,0,0.4);
+  letter-spacing: 2px; line-height: 1.3;
+}
+.ms-hero-sub {
+  font-family: var(--ms-font-b); font-size: 24px; color: #2a1810;
+  background: rgba(255,248,216,0.9);
+  border: 2px solid #2a1810; padding: 8px 14px;
+  display: inline-block; box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+}
+.ms-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--ms-font-d); font-size: 9px; letter-spacing: 1px;
+  background: #fff8d8; color: #c64b1b;
+  border: 2px solid #2a1810; padding: 4px 8px;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+}
+
+/* ── Inventory tab button (used in InvPanel client component) ── */
+.ms-inv-tab {
+  font-family: var(--ms-font-d);
+  font-size: 9px; letter-spacing: 1px;
+  border: 2px solid #1a0a04; cursor: pointer;
+  padding: 6px 10px;
+  background: var(--ms-slot-bg);
+  color: var(--ms-text);
+  flex: 1;
+  transition: background 0.1s;
+}
+.ms-inv-tab:hover { background: var(--ms-slot-hover); }
+.ms-inv-tab.active {
+  background: linear-gradient(to bottom, #f8c34a 0%, #e2a020 100%);
+  color: #2a1810;
+  text-shadow: 1px 1px 0 #fff5b0;
+  box-shadow: inset 1px 1px 0 #fff5b0;
+}
+
+/* ── Walking mob parade (fixed at bottom of page) ── */
+@keyframes ms-walk {
+  0%   { transform: translateX(-80px); }
+  100% { transform: translateX(calc(100vw + 80px)); }
+}
+.ms-mob-parade {
+  position: fixed; bottom: 8px; left: 0; right: 0;
+  height: 64px; pointer-events: none; z-index: 30; overflow: hidden;
+}
+.ms-mob-sprite {
+  position: absolute; bottom: 0;
+  image-rendering: pixelated; image-rendering: crisp-edges;
+}
+
+/* ── Sparkle decoration ── */
+@keyframes ms-sparkle {
+  0%, 100% { opacity: 0.4; transform: scale(0.8) rotate(0deg); }
+  50%       { opacity: 1;   transform: scale(1.1) rotate(180deg); }
+}
+.ms-sparkle {
+  position: absolute; color: #f8c34a; font-size: 16px;
+  animation: ms-sparkle 1.6s ease-in-out infinite;
+  pointer-events: none; user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ms-sparkle, .ms-mob-sprite { animation: none; }
+  .ms-stat-fill { transition: none; }
+}
+
+/* ── Mobile readability ── */
+@media (max-width: 640px) {
+  /* Slightly larger pixel fonts on small screens */
+  .ms-section-title { font-size: 11px !important; }
+  .ms-hero-title   { font-size: 12px !important; }
+  .ms-btn          { font-size: 10px !important; padding: 10px 18px !important; }
+  .ms-btn-sm       { font-size: 9px !important; padding: 6px 12px !important; }
+  /* Ensure tables scroll horizontally */
+  .ms-pixel-panel { overflow-x: auto; }
+  /* Prevent long strings from breaking layout */
+  .ms-pixel-panel,
+  .ms-npc-box     { word-break: break-word; hyphens: auto; }
+
+  /* Tighter padding on cards */
+  .ms-quest-body  { padding: 12px 14px 14px !important; }
+  .ms-step-card   { padding: 18px 14px 14px !important; }
+  .ms-boss-card   { padding: 14px !important; }
+  .ms-testimony-body { padding: 18px 14px 10px !important; font-size: 18px !important; }
+
+  /* Reduce large body text sizes */
+  .ms-step-body   { font-size: 18px !important; }
+  .ms-muted       { font-size: 18px !important; }
+  .ms-npc-text    { font-size: 18px !important; }
+
+  /* Ensure quest titles don't overflow */
+  .ms-quest-title { font-size: 11px !important; word-break: break-word !important; }
+
+  /* Smaller section banner */
+  .ms-section-banner { font-size: 10px !important; padding: 8px 14px !important; }
+
+  /* Reduce stat bar label width so track doesn't vanish */
+  .ms-stat-label  { width: 36px !important; font-size: 8px !important; }
+  .ms-stat-value  { min-width: 56px !important; font-size: 8px !important; }
+}

@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import MapleWindow from '@/components/maple/MapleWindow'
-import Sprite from '@/components/maple/Sprite'
+import NpcBox from '@/components/maple/NpcBox'
+import SectionBanner from '@/components/maple/SectionBanner'
 import ContactForm from '@/components/contact/ContactForm'
+import { getSocialLinks } from '@/lib/settings'
 
 export const metadata: Metadata = {
   title: 'Contact Us',
@@ -16,69 +17,111 @@ export const metadata: Metadata = {
   },
 }
 
-const cardStyle = {
-  backgroundColor: 'var(--surface)',
-  border: '1px solid var(--border)',
-  boxShadow: '0 1px 6px rgba(28,21,39,0.05)',
-} as const
-
 const EXPECT = [
-  { emoji: '👀', title: 'We read every message', text: 'A real person on the team reviews each submission — no auto-responders.' },
-  { emoji: '📧', title: 'Replies come by email', text: 'Make sure the email you enter is correct; that’s how we follow up.' },
-  { emoji: '⚖️', title: 'Appeals are reviewed fairly', text: 'Ban appeals go straight to staff. Be honest and include any proof you have.' },
+  { icon: '👀', title: 'We read every message', text: 'A real person on the team reviews each submission — no auto-responders.' },
+  { icon: '📧', title: 'Replies come by email', text: 'Make sure the email you enter is correct; that’s how we follow up.' },
+  { icon: '⚖️', title: 'Appeals are reviewed fairly', text: 'Ban appeals go straight to staff. Be honest and include any proof you have.' },
 ]
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const social = await getSocialLinks()
+  const discordUrl = social.discord || 'https://discord.gg/jKueJFAErs'
+
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-      {/* Header */}
-      <div className="mb-8 flex items-center gap-3">
-        <Sprite src="/maple/mobs/blue-snail.gif" alt="" height={56} anim="hop" grounded={false} className="hidden sm:block shrink-0" />
-        <div>
-          <h1 className="font-display font-bold text-2xl sm:text-3xl" style={{ color: 'var(--foreground)', letterSpacing: '0.02em' }}>
-            Contact Us
-          </h1>
-          <p className="text-sm mt-1" style={{ color: 'var(--foreground-subtle)' }}>
-            Pick the option that fits best and we’ll get back to you by email.
-          </p>
-        </div>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14 relative">
+      {/* Floating sprite decorations */}
+      <img
+        src="/maple/mobs/blue-snail.gif"
+        alt=""
+        className="sprite sprite-hop absolute -left-4 top-32 hidden lg:block"
+        width={48}
+        height={48}
+        aria-hidden
+      />
+      <img
+        src="/maple/mobs/pig.gif"
+        alt=""
+        className="sprite sprite-bob absolute -right-4 top-60 hidden lg:block"
+        width={48}
+        height={48}
+        aria-hidden
+      />
+      <img
+        src="/maple/mobs/red-snail.gif"
+        alt=""
+        className="sprite sprite-sway absolute left-8 bottom-20 hidden lg:block"
+        width={40}
+        height={40}
+        aria-hidden
+      />
+
+      {/* Hero */}
+      <div className="mb-8 text-center sm:text-left">
+        <SectionBanner>Contact Us</SectionBanner>
+        <h1 className="ms-hero-title">Send a message</h1>
+        <p className="ms-hero-sub mt-3">Pick the option that fits best and we’ll get back to you by email.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 lg:gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 lg:gap-8 items-start">
         {/* Form */}
-        <MapleWindow title="Send us a message" bodyClassName="p-5 sm:p-6">
-          <ContactForm />
-        </MapleWindow>
+        <NpcBox title="Send us a message" npcName="Maya">
+          <div style={{ fontFamily: 'var(--ms-font-b)', fontSize: 18 }}>
+            <ContactForm />
+          </div>
+        </NpcBox>
 
         {/* Sidebar */}
-        <aside className="flex flex-col gap-4">
+        <aside className="flex flex-col gap-5">
           {/* Discord CTA */}
-          <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%)' }}>
-            <h2 className="font-display font-bold text-base mb-1" style={{ color: '#fff' }}>💬 Prefer Discord?</h2>
-            <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.8)' }}>
-              For quick questions, the fastest way to reach us — and the rest of the community — is our Discord server.
-            </p>
-            <a
-              href="https://discord.gg/jKueJFAErs"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-150 hover:scale-[1.02]"
-              style={{ backgroundColor: 'var(--accent)', color: '#fff' }}
+          <div className="ms-pixel-panel p-0">
+            <div
+              className="px-4 py-3"
+              style={{
+                fontFamily: 'var(--ms-font-d)',
+                fontSize: 11,
+                letterSpacing: 1,
+                color: '#ffd96b',
+                background: 'linear-gradient(to bottom, #6a4830 0%, #4a3220 100%)',
+                borderBottom: '3px solid var(--ms-npc-border-out)',
+              }}
             >
-              Join our Discord →
-            </a>
+              💬 Prefer Discord?
+            </div>
+            <div className="p-4" style={{ fontFamily: 'var(--ms-font-b)', fontSize: 20, color: 'var(--ms-text)' }}>
+              <p className="mb-4">For quick questions, the fastest way to reach us — and the rest of the community — is our Discord server.</p>
+              <a
+                href={discordUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ms-btn ms-btn-sm"
+              >
+                Join our Discord →
+              </a>
+            </div>
           </div>
 
           {/* What to expect */}
-          <div className="rounded-2xl p-5" style={cardStyle}>
-            <h2 className="font-semibold text-sm mb-3" style={{ color: 'var(--foreground)' }}>What to expect</h2>
-            <ul className="flex flex-col gap-3">
+          <div className="ms-pixel-panel p-0">
+            <div
+              className="px-4 py-3"
+              style={{
+                fontFamily: 'var(--ms-font-d)',
+                fontSize: 11,
+                letterSpacing: 1,
+                color: '#ffd96b',
+                background: 'linear-gradient(to bottom, #6a4830 0%, #4a3220 100%)',
+                borderBottom: '3px solid var(--ms-npc-border-out)',
+              }}
+            >
+              What to expect
+            </div>
+            <ul className="flex flex-col gap-3 p-4">
               {EXPECT.map((e) => (
-                <li key={e.title} className="flex gap-3">
-                  <span aria-hidden className="text-lg shrink-0">{e.emoji}</span>
+                <li key={e.title} className="flex gap-3" style={{ fontFamily: 'var(--ms-font-b)', fontSize: 20, color: 'var(--ms-text)' }}>
+                  <span aria-hidden className="text-lg shrink-0">{e.icon}</span>
                   <div>
-                    <div className="font-semibold text-sm" style={{ color: 'var(--foreground)' }}>{e.title}</div>
-                    <p className="text-xs mt-0.5 leading-snug" style={{ color: 'var(--foreground-muted)' }}>{e.text}</p>
+                    <div style={{ fontFamily: 'var(--ms-font-d)', fontSize: 10, color: '#c64b1b', letterSpacing: 1 }}>{e.title}</div>
+                    <p className="mt-0.5 leading-snug" style={{ color: '#4a3220' }}>{e.text}</p>
                   </div>
                 </li>
               ))}
@@ -86,15 +129,33 @@ export default function ContactPage() {
           </div>
 
           {/* Before you write */}
-          <div className="rounded-2xl p-5" style={{ backgroundColor: 'var(--primary-subtle)', border: '1px solid var(--border-subtle)' }}>
-            <h2 className="font-semibold text-sm mb-2" style={{ color: 'var(--primary)' }}>Before you write</h2>
-            <p className="text-xs mb-3" style={{ color: 'var(--foreground-muted)' }}>
-              Your question may already be answered — check these first.
-            </p>
-            <div className="flex flex-col gap-1.5 text-sm">
-              <Link href="/guide" className="font-semibold hover:underline" style={{ color: 'var(--primary)' }}>📖 Player Guide & FAQ</Link>
-              <Link href="/status" className="font-semibold hover:underline" style={{ color: 'var(--primary)' }}>📡 Server Status</Link>
-              <Link href="/privacy" className="font-semibold hover:underline" style={{ color: 'var(--primary)' }}>🔒 Privacy Policy</Link>
+          <div className="ms-pixel-panel p-0">
+            <div
+              className="px-4 py-3"
+              style={{
+                fontFamily: 'var(--ms-font-d)',
+                fontSize: 11,
+                letterSpacing: 1,
+                color: '#ffd96b',
+                background: 'linear-gradient(to bottom, #6a4830 0%, #4a3220 100%)',
+                borderBottom: '3px solid var(--ms-npc-border-out)',
+              }}
+            >
+              Before you write
+            </div>
+            <div className="p-4" style={{ fontFamily: 'var(--ms-font-b)', fontSize: 20, color: 'var(--ms-text)' }}>
+              <p className="mb-3" style={{ color: '#4a3220' }}>Your question may already be answered — check these first.</p>
+              <div className="flex flex-col gap-2">
+                <Link href="/guide" className="ms-btn ms-btn-sm">
+                  📖 Player Guide &amp; FAQ
+                </Link>
+                <Link href="/status" className="ms-btn ms-btn-sm">
+                  📡 Server Status
+                </Link>
+                <Link href="/privacy" className="ms-btn ms-btn-sm">
+                  🔒 Privacy Policy
+                </Link>
+              </div>
             </div>
           </div>
         </aside>

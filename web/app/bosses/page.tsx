@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import BossTimer from '@/components/bosses/BossTimer'
 import Sprite from '@/components/maple/Sprite'
+import SectionBanner from '@/components/maple/SectionBanner'
 import type { Metadata } from 'next'
 
 export const revalidate = 60
@@ -27,10 +28,6 @@ type BossEntry = { characterName: string; kills: number }
 type BossMap = Record<string, { total: number; top: BossEntry[] }>
 type GroupRow = { characterid: number; _count: { id: number } }
 
-// Top 5 killers + total kills for a single boss. Querying per boss (rather than
-// one global groupBy with a row cap) guarantees every boss gets its true top 5
-// — a global `take` would drop a low-volume boss whose killers sort below the
-// cap behind a high-volume boss.
 async function topAndTotal(table: 'daily' | 'weekly', boss: string): Promise<{ top: GroupRow[]; total: number }> {
   if (table === 'daily') {
     const [top, total] = await Promise.all([
@@ -79,86 +76,79 @@ export default async function BossesPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-      <div className="mb-10 flex items-center gap-3">
-        <Sprite src="/maple/mobs/mushmom.gif" alt="" height={56} anim="bob" grounded={false} className="shrink-0" />
-        <div>
-          <h1
-            className="font-display font-bold text-2xl sm:text-3xl"
-            style={{ color: 'var(--foreground)', letterSpacing: '0.02em' }}
-          >
-            Boss Leaderboards
-          </h1>
-          <p className="text-sm mt-1" style={{ color: 'var(--foreground-subtle)' }}>
-            Kill counts reset with the server&apos;s daily and weekly cycles
-          </p>
+      {/* Hero */}
+      <div className="relative mb-12 text-center sm:text-left">
+        <span className="ms-sparkle" style={{ top: '10%', right: '5%' }}>✦</span>
+        <span className="ms-sparkle" style={{ bottom: '0%', left: '2%', animationDelay: '0.5s' }}>✦</span>
+        <div className="absolute -top-4 right-0 hidden sm:block">
+          <Sprite src="/maple/mobs/zakum.gif" alt="" height={52} anim="bob" grounded={false} delay={200} />
         </div>
+        <div className="absolute top-10 -left-6 hidden sm:block">
+          <Sprite src="/maple/mobs/pink-bean.gif" alt="" height={44} anim="hop" grounded={false} delay={400} />
+        </div>
+        <SectionBanner>Boss Leaderboards</SectionBanner>
+        <h1 className="ms-hero-title mt-2">Boss Records</h1>
+        <p className="ms-hero-sub mt-3">Kill counts reset with the server&apos;s daily and weekly cycles</p>
       </div>
 
       {/* Reset countdowns */}
-      <div
-        className="mb-8 rounded-2xl px-5 py-4 flex flex-col sm:flex-row gap-4 sm:gap-10"
-        style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)' }}
-      >
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--foreground-subtle)' }}>Daily reset in</span>
-          <BossTimer period="daily" />
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--foreground-subtle)' }}>Weekly reset in</span>
-          <BossTimer period="weekly" />
+      <div className="ms-pixel-panel mb-10 p-4 sm:p-5">
+        <div
+          className="flex flex-col sm:flex-row gap-4 sm:gap-10"
+          style={{ fontFamily: 'var(--ms-font-b)', fontSize: '20px' }}
+        >
+          <div className="flex items-center gap-3">
+            <span className="ms-pill">Daily</span>
+            <BossTimer period="daily" />
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="ms-pill">Weekly</span>
+            <BossTimer period="weekly" />
+          </div>
         </div>
       </div>
 
-      {(['daily', 'weekly'] as const).map(period => {
+      {(['daily', 'weekly'] as const).map((period) => {
         const stats = period === 'daily' ? daily : weekly
         return (
           <section key={period} className="mb-12">
-            <h2
-              className="text-xs font-semibold uppercase tracking-widest mb-4"
-              style={{ color: 'var(--foreground-subtle)' }}
-            >
-              {period === 'daily' ? 'Daily' : 'Weekly'}
-            </h2>
+            <SectionBanner>{period === 'daily' ? 'Daily' : 'Weekly'}</SectionBanner>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {BOSS_ORDER.map(bossKey => {
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {BOSS_ORDER.map((bossKey) => {
                 const info = BOSS_LABELS[bossKey]
                 const data = stats[bossKey]
                 return (
-                  <div
-                    key={bossKey}
-                    className="rounded-2xl overflow-hidden"
-                    style={{
-                      backgroundColor: 'var(--surface)',
-                      border: '1px solid var(--border)',
-                      boxShadow: '0 1px 6px rgba(28,21,39,0.05)',
-                    }}
-                  >
+                  <div key={bossKey} className="ms-boss-card">
+                    <span className="ms-boss-label">{info.label}</span>
+
                     {/* Boss header */}
-                    <div
-                      className="px-4 py-3 flex items-center justify-between"
-                      style={{ borderBottom: '1px solid var(--border-subtle)' }}
-                    >
-                      <div className="flex items-center gap-2.5">
-                        {info.sprite ? (
-                          <span
-                            className="inline-flex items-center justify-center w-9 h-9 rounded-lg shrink-0 overflow-hidden"
-                            style={{ backgroundColor: `${info.accent}14`, border: `1px solid ${info.accent}33` }}
-                          >
-                            <Sprite src={info.sprite} alt={info.label} height={28} anim="bob" grounded={false} />
-                          </span>
-                        ) : (
-                          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: info.accent }} />
-                        )}
-                        <span className="font-bold text-sm font-display" style={{ color: 'var(--foreground)' }}>
-                          {info.label}
-                        </span>
-                      </div>
+                    <div className="flex items-center justify-center gap-2.5 mb-4 mt-2">
+                      {info.sprite ? (
+                        <Sprite src={info.sprite} alt={info.label} height={32} anim="bob" grounded={false} />
+                      ) : (
+                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: info.accent }} />
+                      )}
                       <span
-                        className="text-xs font-mono font-bold px-2 py-0.5 rounded-full"
                         style={{
-                          backgroundColor: `${info.accent}18`,
+                          fontFamily: 'var(--ms-font-d)',
+                          fontSize: '11px',
+                          color: '#f8c34a',
+                          letterSpacing: '1px',
+                        }}
+                      >
+                        {info.label}
+                      </span>
+                    </div>
+
+                    {/* Total kills */}
+                    <div className="mb-4">
+                      <span
+                        className="ms-pill"
+                        style={{
+                          background: `${info.accent}22`,
                           color: info.accent,
+                          borderColor: info.accent,
                         }}
                       >
                         {data?.total ?? 0} kills
@@ -166,35 +156,61 @@ export default async function BossesPage() {
                     </div>
 
                     {/* Top killers */}
-                    <div className="p-3 flex flex-col gap-1.5">
+                    <div className="flex flex-col gap-1.5" style={{ fontFamily: 'var(--ms-font-b)', fontSize: '18px' }}>
                       {data && data.top.length > 0 ? (
                         data.top.map((entry, i) => (
-                          <div key={i} className="flex items-center justify-between gap-2 text-sm">
+                          <div
+                            key={i}
+                            className="flex items-center justify-between gap-2 px-2 py-1.5"
+                            style={{
+                              backgroundColor:
+                                i < 3 ? `${info.accent}18` : 'rgba(255,255,255,0.06)',
+                              border: '2px solid rgba(255,255,255,0.08)',
+                            }}
+                          >
                             <div className="flex items-center gap-2 min-w-0">
                               <span
-                                className="text-xs font-bold w-4 shrink-0 text-right"
-                                style={{ color: i < 3 ? info.accent : 'var(--foreground-subtle)' }}
+                                style={{
+                                  fontFamily: 'var(--ms-font-d)',
+                                  fontSize: '9px',
+                                  color: i < 3 ? info.accent : '#9c8fa6',
+                                  width: '20px',
+                                  textAlign: 'right',
+                                  flexShrink: 0,
+                                }}
                               >
                                 {i + 1}
                               </span>
                               <Link
                                 href={`/character/${encodeURIComponent(entry.characterName)}`}
-                                className="truncate hover:underline font-medium"
-                                style={{ color: 'var(--foreground)' }}
+                                className="truncate hover:underline"
+                                style={{ color: '#fff8d8' }}
                               >
                                 {entry.characterName}
                               </Link>
                             </div>
                             <span
-                              className="font-mono text-xs shrink-0"
-                              style={{ color: 'var(--foreground-subtle)' }}
+                              style={{
+                                fontFamily: 'var(--ms-font-d)',
+                                fontSize: '9px',
+                                color: '#9c8fa6',
+                                whiteSpace: 'nowrap',
+                                flexShrink: 0,
+                              }}
                             >
-                              ×{entry.kills}
+                              x{entry.kills}
                             </span>
                           </div>
                         ))
                       ) : (
-                        <p className="text-xs text-center py-2" style={{ color: 'var(--foreground-subtle)' }}>
+                        <p
+                          className="text-center py-3"
+                          style={{
+                            color: '#9c8fa6',
+                            fontFamily: 'var(--ms-font-b)',
+                            fontSize: '18px',
+                          }}
+                        >
                           No kills recorded
                         </p>
                       )}

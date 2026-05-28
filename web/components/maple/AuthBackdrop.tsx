@@ -13,7 +13,7 @@ const CLOUDS = [
   { top: '9%', size: 64, dur: 58, delay: -30, op: 0.8 },
 ]
 
-export default function AuthBackdrop({ children }: { children: ReactNode }) {
+export default function AuthBackdrop({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div
       className="relative min-h-[88vh] flex items-center justify-center px-4 py-16 sm:py-20 overflow-hidden"
@@ -39,7 +39,7 @@ export default function AuthBackdrop({ children }: { children: ReactNode }) {
       ))}
 
       {/* Auth card */}
-      <div className="relative z-10 w-full max-w-sm">{children}</div>
+      <div className={`relative z-10 w-full ${className ?? 'max-w-sm'}`}>{children}</div>
 
       {/* Grass ridge with idling mobs */}
       <div aria-hidden className="absolute inset-x-0 bottom-0 pointer-events-none">

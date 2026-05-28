@@ -42,10 +42,10 @@ export default async function AccountPage() {
       <div className="mb-8 flex items-center gap-3">
         <Sprite src="/maple/mobs/snail.gif" alt="" height={56} anim="hop" grounded={false} className="shrink-0" />
         <div>
-          <h1 className="font-display font-bold text-2xl sm:text-3xl" style={{ color: 'var(--foreground)', letterSpacing: '0.02em' }}>
+          <h1 className="ms-section-title" style={{ margin: 0 }}>
             My Account
           </h1>
-          <p className="text-sm mt-1" style={{ color: 'var(--foreground-subtle)' }}>
+          <p className="mt-1" style={{ fontFamily: 'var(--ms-font-b)', fontSize: '18px', color: '#4a3220' }}>
             Manage your ShinyMS account
           </p>
         </div>
@@ -54,32 +54,34 @@ export default async function AccountPage() {
       {/* Ban notice */}
       {account.banned === 1 && (
         <div
-          className="rounded-xl p-4 mb-6 text-sm"
-          style={{ backgroundColor: 'var(--destructive-subtle)', border: '1px solid var(--destructive-border)', color: 'var(--destructive)' }}
+          className="ms-pixel-panel p-4 mb-6"
+          style={{ borderColor: '#c64b1b', background: '#fef2f2' }}
         >
-          <p className="font-semibold">Your account is banned.</p>
-          {account.banreason && <p className="mt-1 opacity-80">Reason: {account.banreason}</p>}
-          <p className="mt-1 opacity-70">To appeal, contact an admin on Discord.</p>
+          <p style={{ fontFamily: 'var(--ms-font-d)', fontSize: '10px', color: '#c64b1b' }}>Your account is banned.</p>
+          {account.banreason && <p className="mt-1" style={{ fontFamily: 'var(--ms-font-b)', fontSize: '18px', color: '#4a3220' }}>Reason: {account.banreason}</p>}
+          <p className="mt-1" style={{ fontFamily: 'var(--ms-font-b)', fontSize: '16px', color: '#4a3220' }}>To appeal, contact an admin on Discord.</p>
         </div>
       )}
 
       <div className="flex flex-col gap-6">
         {/* Play CTA */}
-        <a
-          href="https://play.shinyms.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded-xl p-4 flex items-center justify-between gap-4 transition-all duration-150 hover:scale-[1.01]"
-          style={{ background: 'linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%)' }}
-        >
-          <div>
-            <p className="font-display font-bold text-sm" style={{ color: '#fff', letterSpacing: '0.03em' }}>Jump back into the game →</p>
-            <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>Play instantly in your browser. No download needed.</p>
-          </div>
-        </a>
+        <div className="ms-pixel-panel p-4">
+          <a
+            href="https://play.shinyms.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ms-btn ms-btn-green"
+            style={{ display: 'flex', width: '100%', justifyContent: 'center' }}
+          >
+            Jump back into the game →
+          </a>
+          <p className="text-center mt-3" style={{ fontFamily: 'var(--ms-font-b)', fontSize: '18px', color: '#4a3220' }}>
+            Play instantly in your browser. No download needed.
+          </p>
+        </div>
 
         {/* Currency cards */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
             { label: 'NX Credit', value: (account.nxCredit ?? 0).toLocaleString() },
             { label: 'MaplePoints', value: (account.maplePoint ?? 0).toLocaleString() },
@@ -87,13 +89,15 @@ export default async function AccountPage() {
           ].map(({ label, value }) => (
             <div
               key={label}
-              className="rounded-xl p-4 text-center"
-              style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', boxShadow: '0 1px 4px rgba(28,21,39,0.05)' }}
+              className="ms-pixel-panel p-4 text-center"
             >
-              <div className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: 'var(--foreground-subtle)' }}>
+              <div
+                className="mb-2 uppercase tracking-widest"
+                style={{ fontFamily: 'var(--ms-font-d)', fontSize: '9px', color: '#4a3220' }}
+              >
                 {label}
               </div>
-              <div className="font-mono font-bold text-xl" style={{ color: 'var(--primary)' }}>
+              <div style={{ fontFamily: 'var(--ms-font-d)', fontSize: '14px', color: '#2a1810' }}>
                 {value}
               </div>
             </div>
@@ -101,71 +105,103 @@ export default async function AccountPage() {
         </div>
 
         {/* Account info */}
-        <div
-          className="rounded-xl overflow-hidden"
-          style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', boxShadow: '0 1px 4px rgba(28,21,39,0.05)' }}
-        >
-          <div className="px-5 py-3.5" style={{ borderBottom: '1px solid var(--border-subtle)', backgroundColor: 'var(--surface-subtle)' }}>
-            <h2 className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>Account Info</h2>
+        <div className="ms-pixel-panel overflow-hidden">
+          <div
+            className="px-5 py-3"
+            style={{
+              background: 'linear-gradient(to bottom, #6a4830 0%, #4a3220 50%, #3a2418 100%)',
+              borderBottom: '3px solid #2a1810',
+            }}
+          >
+            <h2 style={{ fontFamily: 'var(--ms-font-d)', fontSize: '11px', color: '#ffd96b', letterSpacing: '1px' }}>Account Info</h2>
           </div>
-          <div className="divide-y" style={{ borderColor: 'var(--border-subtle)' }}>
+          <div>
             {[
               { label: 'Username', value: account.name },
               { label: 'Email', value: account.email ?? '—' },
               { label: 'Joined', value: new Date(account.createdat).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) },
               { label: 'Last Login', value: account.lastlogin ? new Date(account.lastlogin).toLocaleString() : '—' },
-            ].map(({ label, value }) => (
-              <div key={label} className="flex items-center justify-between px-5 py-3.5">
-                <span className="text-sm" style={{ color: 'var(--foreground-subtle)' }}>{label}</span>
-                <span className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>{value}</span>
+            ].map(({ label, value }, i) => (
+              <div
+                key={label}
+                className="flex items-center justify-between px-5 py-3"
+                style={{
+                  backgroundColor: i % 2 === 0 ? 'var(--ms-panel-bg)' : '#f0dfb0',
+                  borderBottom: '1px solid var(--ms-slot-shadow)',
+                }}
+              >
+                <span style={{ fontFamily: 'var(--ms-font-b)', fontSize: '18px', color: '#4a3220' }}>{label}</span>
+                <span style={{ fontFamily: 'var(--ms-font-b)', fontSize: '18px', color: '#2a1810' }}>{value}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Characters */}
-        <div
-          className="rounded-xl overflow-hidden"
-          style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', boxShadow: '0 1px 4px rgba(28,21,39,0.05)' }}
-        >
-          <div className="px-5 py-3.5 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border-subtle)', backgroundColor: 'var(--surface-subtle)' }}>
-            <h2 className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>Characters</h2>
-            <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ backgroundColor: 'var(--primary-subtle)', color: 'var(--primary)' }}>
+        <div className="ms-pixel-panel overflow-hidden">
+          <div
+            className="px-5 py-3 flex items-center justify-between"
+            style={{
+              background: 'linear-gradient(to bottom, #6a4830 0%, #4a3220 50%, #3a2418 100%)',
+              borderBottom: '3px solid #2a1810',
+            }}
+          >
+            <h2 style={{ fontFamily: 'var(--ms-font-d)', fontSize: '11px', color: '#ffd96b', letterSpacing: '1px' }}>Characters</h2>
+            <span
+              style={{
+                fontFamily: 'var(--ms-font-d)',
+                fontSize: '9px',
+                backgroundColor: '#f8c34a',
+                color: '#2a1810',
+                border: '2px solid #3a2418',
+                padding: '2px 6px',
+                boxShadow: '2px 2px 0 rgba(0,0,0,0.3)',
+              }}
+            >
               {account.characters.length}
             </span>
           </div>
           {account.characters.length === 0 ? (
-            <div className="px-5 py-10 text-center text-sm" style={{ color: 'var(--foreground-subtle)' }}>
+            <div className="px-5 py-10 text-center" style={{ fontFamily: 'var(--ms-font-b)', fontSize: '20px', color: '#4a3220' }}>
               No characters yet.{" "}
-              <a href="https://play.shinyms.com" target="_blank" rel="noopener noreferrer" className="font-semibold hover:underline" style={{ color: 'var(--primary)' }}>
+              <a href="https://play.shinyms.com" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: '#c64b1b' }}>
                 Launch the game →
               </a>
             </div>
           ) : (
-            <div className="divide-y" style={{ borderColor: 'var(--border-subtle)' }}>
-              {account.characters.map(c => (
+            <div>
+              {account.characters.map((c, i) => (
                 <Link
                   key={c.id}
                   href={`/character/${encodeURIComponent(c.name)}`}
-                  className="flex items-center justify-between px-5 py-3.5 hover-row"
+                  className="flex flex-wrap items-center justify-between px-5 py-3 transition-colors hover:bg-[var(--ms-slot-hover)] gap-y-1"
+                  style={{
+                    backgroundColor: i % 2 === 0 ? 'var(--ms-panel-bg)' : '#f0dfb0',
+                    borderBottom: '1px solid var(--ms-slot-shadow)',
+                  }}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
                     <div
-                      className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold"
-                      style={{ backgroundColor: 'var(--primary-subtle)', color: 'var(--primary)' }}
+                      className="w-8 h-8 flex items-center justify-center shrink-0"
+                      style={{
+                        backgroundColor: '#f8c34a',
+                        border: '2px solid #3a2418',
+                        fontFamily: 'var(--ms-font-d)',
+                        fontSize: '10px',
+                        color: '#2a1810',
+                        boxShadow: '2px 2px 0 rgba(0,0,0,0.3)',
+                      }}
                     >
                       {c.name.charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>{c.name}</span>
+                    <span className="truncate" style={{ fontFamily: 'var(--ms-font-b)', fontSize: '18px', color: '#2a1810', fontWeight: 600 }}>{c.name}</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs" style={{ color: 'var(--foreground-subtle)' }}>
-                      Lv. <span className="font-mono font-bold" style={{ color: 'var(--foreground-muted)' }}>{c.level}</span>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span style={{ fontFamily: 'var(--ms-font-b)', fontSize: '16px', color: '#4a3220' }}>
+                      Lv. <span style={{ fontFamily: 'var(--ms-font-d)', fontSize: '10px', color: '#2a1810' }}>{c.level}</span>
                     </span>
-                    <span className="text-xs" style={{ color: 'var(--foreground-subtle)' }}>{getJobName(c.job)}</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ color: 'var(--foreground-subtle)', opacity: 0.5 }}>
-                      <polyline points="9 18 15 12 9 6"/>
-                    </svg>
+                    <span className="hidden sm:inline" style={{ fontFamily: 'var(--ms-font-b)', fontSize: '16px', color: '#4a3220' }}>{getJobName(c.job)}</span>
+                    <span style={{ fontFamily: 'var(--ms-font-d)', fontSize: '12px', color: '#4a3220' }}>›</span>
                   </div>
                 </Link>
               ))}

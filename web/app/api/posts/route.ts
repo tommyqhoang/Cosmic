@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { sendAnnouncementEmails, sendDiscordAnnouncement } from '@/lib/email'
+import { readSocialLinks } from '@/lib/settings'
 import { z } from 'zod'
 
 const createSchema = z.object({
@@ -52,8 +53,9 @@ export async function POST(req: NextRequest) {
         where: { active: true },
         select: { email: true, token: true },
       })
+      const social = await readSocialLinks()
       await Promise.allSettled([
-        sendAnnouncementEmails(post, subscribers),
+        sendAnnouncementEmails(post, subscribers, social.discord),
         sendDiscordAnnouncement(post),
       ])
     } catch (err) {

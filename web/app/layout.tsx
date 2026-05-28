@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono, Fredoka } from 'next/font/google'
+import { Geist, Geist_Mono, Fredoka, Press_Start_2P, VT323, Pixelify_Sans } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
@@ -11,6 +11,23 @@ const fredoka = Fredoka({
   subsets: ['latin'],
   variable: '--font-fredoka',
   weight: ['400', '500', '600', '700'],
+  display: 'swap',
+})
+const pressStart2P = Press_Start_2P({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-press-start-2p',
+  display: 'swap',
+})
+const vt323 = VT323({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-vt323',
+  display: 'swap',
+})
+const pixelifySans = Pixelify_Sans({
+  subsets: ['latin'],
+  variable: '--font-pixelify-sans',
   display: 'swap',
 })
 
@@ -67,8 +84,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geist.variable} ${geistMono.variable} ${fredoka.variable} h-full`}>
-      <body className="min-h-screen flex flex-col antialiased" style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)' }}>
+    <html lang="en" className={`${geist.variable} ${geistMono.variable} ${fredoka.variable} ${pressStart2P.variable} ${vt323.variable} ${pixelifySans.variable} h-full`}>
+      <body
+        className="min-h-screen flex flex-col antialiased"
+        style={{
+          background:
+            'linear-gradient(to bottom, #7ec4f5 0%, #7ec4f5 35%, #b8e0fa 35%, #b8e0fa 60%, #6ab84a 60%, #6ab84a 75%, #3d7a2e 75%, #c79858 78%, #8b5e2a 100%)',
+          backgroundAttachment: 'fixed',
+          color: 'var(--foreground)',
+        }}
+      >
         <Providers>
           <Header />
           <main className="flex-1">{children}</main>

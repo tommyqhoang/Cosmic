@@ -15,6 +15,9 @@ jest.mock('../../lib/rate-limit', () => ({
   clientIp: jest.fn(() => '1.2.3.4'),
 }))
 jest.mock('../../lib/email', () => ({ sendWelcomeEmail: jest.fn(async () => undefined) }))
+jest.mock('../../lib/settings', () => ({
+  readSocialLinks: jest.fn(async () => ({ discord: 'https://discord.gg/test' })),
+}))
 
 const upsert = prisma.cmsSubscriber.upsert as jest.Mock
 const limiterCheck = subscribeLimiter.check as jest.Mock
@@ -41,7 +44,7 @@ describe('POST /api/subscribe', () => {
     expect(await res.json()).toEqual({ success: true })
     // Email is lower-cased before storage.
     expect(upsert).toHaveBeenCalledWith(expect.objectContaining({ where: { email: 'player@example.com' } }))
-    expect(welcome).toHaveBeenCalledWith('player@example.com', 'tok')
+    expect(welcome).toHaveBeenCalledWith('player@example.com', 'tok', 'https://discord.gg/test')
   })
 
   it('reactivates a returning subscriber via upsert update', async () => {

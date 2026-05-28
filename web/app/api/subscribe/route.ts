@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { subscribeLimiter, clientIp } from '@/lib/rate-limit'
 import { sendWelcomeEmail } from '@/lib/email'
+import { readSocialLinks } from '@/lib/settings'
 
 const schema = z.object({
   email: z.string().email().max(254),
@@ -42,7 +43,8 @@ export async function POST(req: NextRequest) {
   }
 
   // Fire the welcome email but never let a mail failure fail the subscription.
-  await sendWelcomeEmail(email, welcomeToken)
+  const social = await readSocialLinks()
+  await sendWelcomeEmail(email, welcomeToken, social.discord)
 
   return Response.json({ success: true }, { status: 201 })
 }
