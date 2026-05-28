@@ -1,9 +1,10 @@
+# syntax=docker/dockerfile:1
 FROM node:20-alpine AS base
 
 FROM base AS deps
 WORKDIR /app
 COPY web/package*.json ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm npm ci
 
 FROM base AS builder
 WORKDIR /app

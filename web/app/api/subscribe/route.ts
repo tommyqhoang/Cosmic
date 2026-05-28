@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     const sub = await prisma.cmsSubscriber.upsert({
       where: { email },
       create: { email, token },
-      update: { active: true, unsubscribedAt: null },
+      update: { active: true, unsubscribedAt: null, token },
     })
     welcomeToken = sub.token
   } catch (err) {

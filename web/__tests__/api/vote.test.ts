@@ -84,10 +84,15 @@ describe('vote pingback', () => {
   it('200 but skips crediting when still inside cooldown', async () => {
     process.env.TOPG_POSTBACK_KEY = TOPG_KEY
     findFirst.mockResolvedValue({ id: 7, name: 'tommy' })
-    recordFind.mockResolvedValue({ date: Math.floor(Date.now() / 1000) })
+    // Simulate MySQL returning 0 affected rows (date unchanged = within cooldown).
+    const mockTx = {
+      $executeRaw: jest.fn().mockResolvedValue(0),
+      account: { update: jest.fn() },
+    }
+    txn.mockImplementation((fn: (tx: typeof mockTx) => Promise<void>) => fn(mockTx))
     const res = await GET(topgReq(`key=${TOPG_KEY}&p_resp=tommy`), ctx('topg'))
     expect(res.status).toBe(200)
-    expect(txn).not.toHaveBeenCalled()
+    expect(mockTx.account.update).not.toHaveBeenCalled()
   })
 
   it('200 with a valid key but unknown account (no crediting)', async () => {

@@ -26,7 +26,14 @@ describe('getJobClass', () => {
   })
 
   it('falls back to Beginner for an out-of-range id', () => {
-    expect(getJobClass(999)).toBe('Beginner')
+    // 700 is between Pirate (500–599) and GM (900–999) — no class covers it.
+    expect(getJobClass(700)).toBe('Beginner')
     expect(getJobClass(-5)).toBe('Beginner')
+  })
+
+  it('classifies GM range correctly', () => {
+    expect(getJobClass(900)).toBe('GM')
+    expect(getJobClass(910)).toBe('SuperGM')
+    expect(getJobClass(999)).toBe('SuperGM')
   })
 })

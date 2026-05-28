@@ -1,5 +1,5 @@
-import { timingSafeEqual } from 'node:crypto'
 import { prisma } from '@/lib/prisma'
+import { safeEqual } from '@/lib/secret'
 import { getLiveServerStatus } from '@/lib/server-status'
 import { sendServerStatusAlert } from '@/lib/discord'
 
@@ -12,12 +12,6 @@ export const dynamic = 'force-dynamic'
 const STATE_KEY = 'server_status_state' // 'online' | 'offline' — last alerted state
 const SINCE_KEY = 'server_status_since' // epoch ms (string) the current state began
 
-function safeEqual(a: string, b: string): boolean {
-  const ab = Buffer.from(a)
-  const bb = Buffer.from(b)
-  if (ab.length !== bb.length) return false
-  return timingSafeEqual(ab, bb)
-}
 
 function authorized(req: Request): boolean {
   const secret = process.env.STATUS_NOTIFY_SECRET?.trim()
