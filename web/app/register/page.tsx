@@ -40,6 +40,7 @@ export default function RegisterPage() {
   })
   const [agreed, setAgreed] = useState(false)
   const [captchaToken, setCaptchaToken] = useState('')
+  const [captchaKey, setCaptchaKey] = useState(0) // bump to remount/reset the widget
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({})
@@ -50,6 +51,10 @@ export default function RegisterPage() {
 
   const update = (field: Field, value: string) => setForm(f => ({ ...f, [field]: value }))
   const blur = (field: Field) => setTouched(t => ({ ...t, [field]: true }))
+  const resetCaptcha = () => {
+    setCaptchaToken('')
+    setCaptchaKey(k => k + 1)
+  }
 
   const nameErr = useMemo(() => validateName(form.name), [form.name])
   const pwdScore = useMemo(() => passwordStrength(form.password), [form.password])
@@ -78,6 +83,7 @@ export default function RegisterPage() {
       const data = await res.json().catch(() => null)
       if (!res.ok) {
         setError(data?.error ?? 'Registration failed. Please try again.')
+        resetCaptcha() // Turnstile tokens are single-use — get a fresh one for retry.
         return
       }
 
@@ -90,12 +96,14 @@ export default function RegisterPage() {
       })
       if (signInResult?.error) {
         setError('Account created, but automatic sign-in failed. Please sign in manually.')
+        resetCaptcha()
         return
       }
       router.push('/')
       router.refresh()
     } catch {
       setError('Network error. Please check your connection and try again.')
+      resetCaptcha()
     } finally {
       setLoading(false)
     }
@@ -363,7 +371,7 @@ export default function RegisterPage() {
 
               {/* Captcha */}
               {captchaRequired && TURNSTILE_SITE_KEY && (
-                <Turnstile siteKey={TURNSTILE_SITE_KEY} onToken={setCaptchaToken} />
+                <Turnstile key={captchaKey} siteKey={TURNSTILE_SITE_KEY} onToken={setCaptchaToken} />
               )}
 
               <button

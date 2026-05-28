@@ -17,6 +17,13 @@ function timeAgo(date: Date | string): string {
   return d < 7 ? `${d}d ago` : `${Math.floor(d / 7)}w ago`
 }
 
+const TYPE_LABELS: Record<string, string> = {
+  mega: 'Mega', super: 'Super', item: 'Item', triple: 'Triple', tv: 'MapleTV',
+}
+function typeLabel(t: string): string {
+  return TYPE_LABELS[t] ?? t
+}
+
 const SAMPLE_CLASSES = ['hero', 'bishop', 'bm', 'nightlord', 'shadower', 'buccaneer', 'paladin', 'il', 'fp', 'dk'] as const
 
 export default function LiveSmegaFeed({ smegas }: { smegas: Smega[] }) {
@@ -88,7 +95,7 @@ export default function LiveSmegaFeed({ smegas }: { smegas: Smega[] }) {
                 fontFamily: 'var(--ms-font-d)', fontSize: 8, color: '#d8c08c',
                 whiteSpace: 'nowrap',
               }}>
-                <span className="hidden sm:inline">ch{s.channel} · </span>
+                <span className="hidden sm:inline">{typeLabel(s.type)} · ch{s.channel} · </span>
                 {tick >= 0 ? timeAgo(s.createdAt) : ''}
               </span>
             </div>

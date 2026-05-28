@@ -1,11 +1,15 @@
 import { NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { revalidateTag } from 'next/cache'
+import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { SOCIAL_PLATFORMS } from '@/lib/social'
 import {
+  readSocialLinksStrict,
+  readGeneralSettingsStrict,
+  readServerRatesStrict,
   readSocialLinks,
   readGeneralSettings,
   readServerRates,
@@ -17,6 +21,24 @@ import {
   MESO_RATE_KEY,
   DROP_RATE_KEY,
 } from '@/lib/settings'
+
+// Prisma raises P2021 when the underlying table is missing. The cms_settings
+// table is provisioned by web/prisma/sql/create_cms_settings.sql (run on deploy
+// by scripts/ensure-cms-tables.mjs); if a database hasn't had it applied yet,
+// reads look "empty" and writes fail — so we surface an actionable message
+// rather than the generic 500 admins can't act on.
+function missingTableResponse(err: unknown): Response | null {
+  if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2021') {
+    return Response.json(
+      {
+        error:
+          'Settings storage is not initialized in this database (the cms_settings table is missing). Redeploy the web service to auto-create it, or run web/prisma/sql/create_cms_settings.sql against the DB.',
+      },
+      { status: 503 },
+    )
+  }
+  return null
+}
 
 const urlOrBlank = z
   .string()
@@ -39,12 +61,17 @@ export async function GET() {
   if (!session) return Response.json({ error: 'Unauthorized' }, { status: 401 })
   if (session.user.webadmin !== 1) return Response.json({ error: 'Forbidden' }, { status: 403 })
 
-  const [social, general, rates] = await Promise.all([
-    readSocialLinks(),
-    readGeneralSettings(),
-    readServerRates(),
-  ])
-  return Response.json({ ...social, contactNpcName: general.contactNpcName, ...rates })
+  try {
+    const [social, general, rates] = await Promise.all([
+      readSocialLinksStrict(),
+      readGeneralSettingsStrict(),
+      readServerRatesStrict(),
+    ])
+    return Response.json({ ...social, contactNpcName: general.contactNpcName, ...rates })
+  } catch (err) {
+    console.error('settings load failed', err)
+    return missingTableResponse(err) ?? Response.json({ error: 'Could not load settings.' }, { status: 500 })
+  }
 }
 
 export async function PUT(req: NextRequest) {
@@ -89,7 +116,7 @@ export async function PUT(req: NextRequest) {
     await prisma.$transaction(ops)
   } catch (err) {
     console.error('settings save failed', err)
-    return Response.json({ error: 'Could not save settings. Please try again.' }, { status: 500 })
+    return missingTableResponse(err) ?? Response.json({ error: 'Could not save settings. Please try again.' }, { status: 500 })
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

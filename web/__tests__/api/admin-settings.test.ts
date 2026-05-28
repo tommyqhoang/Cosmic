@@ -2,6 +2,7 @@
 import { NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { revalidateTag } from 'next/cache'
+import { Prisma } from '@prisma/client'
 import { GET, PUT } from '../../app/api/admin/settings/route'
 import { prisma } from '../../lib/prisma'
 
@@ -11,16 +12,23 @@ jest.mock('next/cache', () => ({ unstable_cache: (fn: unknown) => fn, revalidate
 jest.mock('../../lib/auth', () => ({ authOptions: {} }))
 jest.mock('../../lib/prisma', () => ({
   prisma: {
-    cmsSetting: { findMany: jest.fn(), upsert: jest.fn() },
+    cmsSetting: { findMany: jest.fn(), findUnique: jest.fn(), upsert: jest.fn() },
     $transaction: jest.fn(),
   },
 }))
 
 const session = getServerSession as jest.Mock
 const findMany = prisma.cmsSetting.findMany as jest.Mock
+const findUnique = prisma.cmsSetting.findUnique as jest.Mock
 const upsert = prisma.cmsSetting.upsert as jest.Mock
 const transaction = prisma.$transaction as jest.Mock
 const revalidate = revalidateTag as jest.Mock
+
+const missingTableError = () =>
+  new Prisma.PrismaClientKnownRequestError('Table cms_settings does not exist', {
+    code: 'P2021',
+    clientVersion: 'test',
+  })
 
 function req(body: unknown) {
   return new NextRequest('http://localhost/api/admin/settings', {
@@ -35,6 +43,7 @@ describe('/api/admin/settings', () => {
     jest.clearAllMocks()
     session.mockResolvedValue({ user: { id: '1', webadmin: 1, name: 'admin' } })
     findMany.mockResolvedValue([{ key: 'social_youtube', value: 'https://youtube.com/@x' }])
+    findUnique.mockResolvedValue(null)
     upsert.mockResolvedValue({})
     transaction.mockResolvedValue([])
   })
@@ -49,10 +58,26 @@ describe('/api/admin/settings', () => {
     expect((await GET()).status).toBe(403)
   })
 
-  it('GET returns the social links mapped by platform id', async () => {
+  it('GET returns the social links mapped by platform id, plus general + rates', async () => {
     const res = await GET()
     expect(res.status).toBe(200)
-    expect(await res.json()).toEqual({ youtube: 'https://youtube.com/@x', instagram: '', facebook: '' })
+    expect(await res.json()).toEqual({
+      discord: '',
+      youtube: 'https://youtube.com/@x',
+      instagram: '',
+      facebook: '',
+      contactNpcName: 'Maya',
+      expRate: 7,
+      mesoRate: 5,
+      dropRate: 3,
+    })
+  })
+
+  it('GET 503 with an actionable message when the cms_settings table is missing', async () => {
+    findMany.mockRejectedValue(missingTableError())
+    const res = await GET()
+    expect(res.status).toBe(503)
+    expect((await res.json()).error).toMatch(/cms_settings table is missing/i)
   })
 
   it('PUT 403 for a non-admin', async () => {
@@ -83,6 +108,14 @@ describe('/api/admin/settings', () => {
     transaction.mockRejectedValue(new Error('db down'))
     const res = await PUT(req({ youtube: 'https://youtube.com/@x' }))
     expect(res.status).toBe(500)
+    expect(revalidate).not.toHaveBeenCalled()
+  })
+
+  it('PUT 503 with an actionable message when the cms_settings table is missing', async () => {
+    transaction.mockRejectedValue(missingTableError())
+    const res = await PUT(req({ discord: 'https://discord.gg/abc' }))
+    expect(res.status).toBe(503)
+    expect((await res.json()).error).toMatch(/cms_settings table is missing/i)
     expect(revalidate).not.toHaveBeenCalled()
   })
 })

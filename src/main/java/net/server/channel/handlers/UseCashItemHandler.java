@@ -57,6 +57,7 @@ import org.slf4j.LoggerFactory;
 import server.ItemInformationProvider;
 import server.Shop;
 import server.ShopFactory;
+import server.SmegaService;
 import server.TimerManager;
 import server.maps.AbstractMapObject;
 import server.maps.FieldLimit;
@@ -292,14 +293,19 @@ public final class UseCashItemHandler extends AbstractPacketHandler {
             switch ((itemId / 1000) % 10) {
                 case 1: // Megaphone
                     if (player.getLevel() > 9) {
-                        player.getClient().getChannelServer().broadcastPacket(PacketCreator.serverNotice(2, medal + player.getName() + " : " + p.readString()));
+                        String megaText = p.readString();
+                        player.getClient().getChannelServer().broadcastPacket(PacketCreator.serverNotice(2, medal + player.getName() + " : " + megaText));
+                        SmegaService.record(player, c.getChannel(), "mega", megaText, null);
                     } else {
                         player.dropMessage(1, "You may not use this until you're level 10.");
                         return;
                     }
                     break;
                 case 2: // Super megaphone
-                    Server.getInstance().broadcastMessage(c.getWorld(), PacketCreator.serverNotice(3, c.getChannel(), medal + player.getName() + " : " + p.readString(), (p.readByte() != 0)));
+                    String superText = p.readString();
+                    boolean superEar = p.readByte() != 0;
+                    Server.getInstance().broadcastMessage(c.getWorld(), PacketCreator.serverNotice(3, c.getChannel(), medal + player.getName() + " : " + superText, superEar));
+                    SmegaService.record(player, c.getChannel(), "super", superText, null);
                     break;
                 case 5: // Maple TV
                     int tvType = itemId % 10;
@@ -338,11 +344,13 @@ public final class UseCashItemHandler extends AbstractPacketHandler {
 
                     if (megassenger) {
                         Server.getInstance().broadcastMessage(c.getWorld(), PacketCreator.serverNotice(3, c.getChannel(), medal + player.getName() + " : " + builder, ear));
+                        SmegaService.record(player, c.getChannel(), "tv", builder.toString().trim(), null);
                     }
 
                     break;
                 case 6: //item megaphone
-                    String msg = medal + player.getName() + " : " + p.readString();
+                    String itemMegaText = p.readString();
+                    String msg = medal + player.getName() + " : " + itemMegaText;
                     whisper = p.readByte() == 1;
                     Item item = null;
                     if (p.readByte() == 1) { //item
@@ -355,6 +363,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler {
                         // thanks Conrad for noticing that untradeable items should be allowed in megas
                     }
                     Server.getInstance().broadcastMessage(c.getWorld(), PacketCreator.itemMegaphone(msg, whisper, c.getChannel(), item));
+                    SmegaService.record(player, c.getChannel(), "item", itemMegaText, item == null ? null : item.getItemId());
                     break;
                 case 7: //triple megaphone
                     int lines = p.readByte();
@@ -363,11 +372,14 @@ public final class UseCashItemHandler extends AbstractPacketHandler {
                         return;
                     }
                     String[] msg2 = new String[lines];
+                    String[] tripleLines = new String[lines];
                     for (int i = 0; i < lines; i++) {
-                        msg2[i] = medal + player.getName() + " : " + p.readString();
+                        tripleLines[i] = p.readString();
+                        msg2[i] = medal + player.getName() + " : " + tripleLines[i];
                     }
                     whisper = p.readByte() == 1;
                     Server.getInstance().broadcastMessage(c.getWorld(), PacketCreator.getMultiMegaphone(msg2, c.getChannel(), whisper));
+                    SmegaService.record(player, c.getChannel(), "triple", String.join(" / ", tripleLines), null);
                     break;
             }
             remove(c, position, itemId);

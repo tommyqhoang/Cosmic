@@ -131,6 +131,15 @@ player fires megaphone
   type in-game, confirm (a) the line appears in Discord and (b) a row appears in
   `cms_smega` / the `/community` feed.
 
+## Community page display
+
+`/community` now displays each smega in the same shape as the Discord line. The
+`LiveSmegaFeed` component (`web/components/maple/LiveSmegaFeed.tsx`) maps the
+`type` code to a label (Super / Item / Triple / Mega / MapleTV) and shows
+`<Type> · ch<n> · <time>` in each row's meta, mirroring the Discord
+`(<Type> · CH<n>)` format. Once the capture hook is live, rows actually appear
+instead of the empty-state placeholder.
+
 ## Files touched
 
 - `config/ServerConfig.java` — new field.
@@ -138,6 +147,7 @@ player fires megaphone
 - `server/SmegaService.java` — **new**.
 - `net/server/channel/handlers/UseCashItemHandler.java` — hook calls in cases 1/2/5/6/7.
 - `src/test/java/server/SmegaServiceTest.java` — **new**.
+- `web/components/maple/LiveSmegaFeed.tsx` — type label in feed meta.
 
 ## Open question for review
 

@@ -12,6 +12,9 @@ public class ServerConfig {
     public String DB_PASS;
     public int INIT_CONNECTION_POOL_TIMEOUT;
 
+    //Discord Integration
+    public String DISCORD_SMEGA_WEBHOOK;
+
     //Login Configuration
     public int WORLDS;
     public int WLDLIST_SIZE;

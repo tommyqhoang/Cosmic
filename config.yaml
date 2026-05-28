@@ -165,6 +165,9 @@ server:
     DB_PASS: ""
     INIT_CONNECTION_POOL_TIMEOUT: 90    # Seconds
 
+    #Discord Integration
+    DISCORD_SMEGA_WEBHOOK: ""           #Discord webhook URL. When set, every in-game megaphone is auto-posted to this channel. Leave blank to disable. Secret — do not commit a real URL.
+
     #Login Configuration
     WORLDS: 1                           #Initial number of worlds on the server.
     WLDLIST_SIZE: 21                    #Max possible worlds on the server.
