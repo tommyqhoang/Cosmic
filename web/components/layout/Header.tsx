@@ -30,7 +30,6 @@ const NAV: NavItem[] = [
     children: [
       { href: '/rankings', label: 'Players' },
       { href: '/guilds', label: 'Guilds' },
-      { href: '/bosses', label: 'Boss Records' },
     ],
   },
   {

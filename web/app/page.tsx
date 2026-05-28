@@ -6,7 +6,6 @@ import ServerClock from '@/components/ui/ServerClock'
 import HomeAnnouncements from '@/components/posts/HomeAnnouncements'
 import HeroScene from '@/components/maple/HeroScene'
 import Sprite from '@/components/maple/Sprite'
-import MapleWindow from '@/components/maple/MapleWindow'
 import SmegaTicker from '@/components/maple/SmegaTicker'
 import NewsletterSignup from '@/components/NewsletterSignup'
 import NpcBox from '@/components/maple/NpcBox'
@@ -144,27 +143,6 @@ const TESTIMONIALS = [
     name: 'Borin',
     detail: 'Hero · Lv. 155',
     cls: 'hero',
-  },
-]
-
-const QUICK_LINKS = [
-  {
-    href: '/rankings',
-    icon: '🏆',
-    title: 'Rankings',
-    desc: 'Top players by level & class',
-  },
-  {
-    href: 'https://play.shinyms.com',
-    icon: '▶',
-    title: 'Play Now',
-    desc: 'Launch the game in your browser',
-  },
-  {
-    href: '/vote',
-    icon: '✔',
-    title: 'Vote',
-    desc: 'Vote to earn NX rewards',
   },
 ]
 
@@ -510,38 +488,7 @@ export default async function HomePage() {
       {/* ── Announcements + sidebar ── */}
       <section style={{ backgroundColor: 'var(--ms-npc-bg)', borderTop: '4px solid #1a0a04', borderBottom: '4px solid #1a0a04' }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-            <HomeAnnouncements posts={posts} />
-
-            <div className="flex flex-col gap-6">
-              <MapleWindow title="Quick Links" icon={<span aria-hidden>🔗</span>} bodyClassName="p-2">
-                <div className="flex flex-col gap-1.5">
-                  {QUICK_LINKS.map(({ href, icon, title, desc }) => (
-                    <Link key={href} href={href} className="flex items-center gap-3 p-3 rounded-lg hover-row">
-                      <span style={{ color: 'var(--primary)', fontSize: 18 }}>{icon}</span>
-                      <div>
-                        <div className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>{title}</div>
-                        <div className="text-xs" style={{ color: 'var(--foreground-subtle)' }}>{desc}</div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </MapleWindow>
-
-              <NpcBox
-                title="New to ShinyMS?"
-                npcName="Maple Admin"
-                npcCls="gm"
-                actions={
-                  <a href="https://play.shinyms.com" className="ms-btn ms-btn-sm ms-btn-green">
-                    ▶ Play Now
-                  </a>
-                }
-              >
-                <p>Create a free account and jump straight into the game — no download needed.</p>
-              </NpcBox>
-            </div>
-          </div>
+          <HomeAnnouncements posts={posts} />
         </div>
       </section>
 
