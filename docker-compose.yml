@@ -43,3 +43,4 @@ services:
       GAME_SERVER_HOST: "maplestory"
       GAME_LOGIN_PORT: "8484"
       NEXT_PUBLIC_SITE_URL: "http://127.0.0.1:3000"
+      HANDBOOK_DIR: "/handbook"

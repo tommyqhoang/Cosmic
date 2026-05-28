@@ -50,7 +50,7 @@ describe('POST /api/subscribe', () => {
   it('reactivates a returning subscriber via upsert update', async () => {
     await POST(req({ email: 'a@b.com' }))
     const arg = upsert.mock.calls[0][0]
-    expect(arg.update).toEqual({ active: true, unsubscribedAt: null })
+    expect(arg.update).toEqual({ active: true, unsubscribedAt: null, token: expect.any(String) })
   })
 
   it('400 on an invalid email', async () => {

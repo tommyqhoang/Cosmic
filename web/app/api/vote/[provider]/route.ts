@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
-import { timingSafeEqual } from 'crypto'
 import { prisma } from '@/lib/prisma'
 import { voteLimiter, clientIp } from '@/lib/rate-limit'
+import { safeEqual } from '@/lib/secret'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,12 +43,6 @@ const PROVIDERS: Record<string, Provider> = {
 // alongside the other limiters. The secret is the real guard; this just limits
 // abuse if a secret ever leaks.
 
-function safeEqual(a: string, b: string): boolean {
-  const ab = Buffer.from(a)
-  const bb = Buffer.from(b)
-  if (ab.length !== bb.length) return false
-  return timingSafeEqual(ab, bb)
-}
 
 type ParseResult =
   | { ok: true; voters: string[] }

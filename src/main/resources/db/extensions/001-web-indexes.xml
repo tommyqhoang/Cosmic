@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- Supports ORDER BY reborns DESC, level DESC WHERE gm = 0 (top players query). -->
+    <changeSet id="web-001-top-players-index" author="cosmic-web">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="characters" indexName="idx_characters_web_top"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="characters" indexName="idx_characters_web_top">
+            <column name="gm"/>
+            <column name="reborns" descending="true"/>
+            <column name="level" descending="true"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
